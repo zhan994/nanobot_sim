@@ -1,5 +1,5 @@
-# agi_sim
-**A repo. which maintains simulation tools in gazebo for agi-robotics on ubuntu20.04.**
+# NanoBot_Sim
+**A repo. which maintains simulation tools in gazebo for robotics.**
 
 ![](imgs/gazebo_rviz.gif)
 
@@ -59,8 +59,8 @@
 ## Run
 
 ```bash
-git clone https://github.com/zhan994/agi_sim.git
-cd agi_sim
+git clone https://github.com/zhan994/nanobot_sim.git
+cd nanobot_sim
 catkin_make
 
 # >>>>>>>>>>>>>>>>>>>> with joy <<<<<<<<<<<<<<<<<<<<
