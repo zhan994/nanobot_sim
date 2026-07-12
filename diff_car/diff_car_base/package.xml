@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>diff_car</name>
+  <name>diff_car_base</name>
   <version>0.0.0</version>
   <description>The diff_car package</description>
   <maintainer email="zhanzhihao_dt@163.com">zhan</maintainer>
