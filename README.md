@@ -12,8 +12,8 @@
 **Vehicles**
 
 - **diff_car**: a simple differential robot equipped with 2-wheel drive.
-- **scout**: a differential robot equipped with 4-wheel drive, independent suspension, and a lightweight power system.
 - **tracked**: a compact tracked mobile robot specifically designed to tackle demanding off-road terrains, as well as confined and challenging work areas.
+- **uav**: a simple quadrotor drone based on PX4 firmware.
 
 ## Third-party
 
