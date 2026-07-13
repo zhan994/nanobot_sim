@@ -19,16 +19,20 @@
   <gazebo>
     <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
       <updateRate>100.0</updateRate>
+
       <leftJoint>left_wheel2base_link</leftJoint>
       <rightJoint>right_wheel2base_link</rightJoint>
+      
       <wheelSeparation>${base_link_radius * 2}</wheelSeparation>
       <wheelDiameter>${wheel_radius * 2}</wheelDiameter>
       <wheelTorque>30</wheelTorque>
       <wheelAcceleration>1.8</wheelAcceleration>
+      
       <commandTopic>/cmd_vel</commandTopic>
       <odometryFrame>gz_odom</odometryFrame>
       <odometryTopic>/gz_odom</odometryTopic>
       <robotBaseFrame>base_footprint</robotBaseFrame>
+      
       <!-- Set to true to swap right and left wheels, defaults to true -->
       <legacyMode>false</legacyMode>
       <!-- avoid clash with rviz, robot_state_publisher & joint_state_publisher -->
