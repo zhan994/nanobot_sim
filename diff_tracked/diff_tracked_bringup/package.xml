@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>diff_tracked_bringup</name>
+  <version>0.1.0</version>
+  <description>startup</description>
+
+  <maintainer email="nhy@163.com">democles</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>diff_tracked_gazebo</exec_depend>
+  <exec_depend>diff_tracked_control</exec_depend>
+
+  <export/>
+</package>

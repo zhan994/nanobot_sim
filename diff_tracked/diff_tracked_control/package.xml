@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>diff_tracked_control</name>
+  <version>0.1.0</version>
+  <description>motion controllers</description>
+
+  <license>TODO</license>
+  <maintainer email="nhy@163.com">democles</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>rospy</depend>
+
+  <export/>
+</package>

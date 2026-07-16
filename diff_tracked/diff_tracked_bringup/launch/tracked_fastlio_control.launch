@@ -1,0 +1,37 @@
+<launch>
+  <arg name="start_gazebo" default="true"/>
+  <arg name="start_fastlio" default="true"/>
+  <arg name="start_control" default="true"/>
+  <arg name="rviz" default="true"/>
+
+  <arg name="distance" default="5.0"/>
+  <arg name="speed" default="0.5"/>
+  <arg name="odom_topic" default="/Odometry"/>
+
+  <include if="$(arg start_gazebo)"
+           file="$(find diff_tracked_gazebo)/launch/bunker_gazebo_sim.launch">
+    <arg name="rviz" value="false"/>
+  </include>
+
+  <include if="$(arg start_fastlio)"
+           file="$(find fast_lio)/launch/mapping_velodyne.launch">
+    <arg name="rviz" value="$(arg rviz)"/>
+  </include>
+
+  <!-- Gazebo's PointCloud2 time field is in seconds. The LiDAR is 0.025 m
+       below the IMU in the current robot model. -->
+  <group if="$(arg start_fastlio)">
+    <param name="/preprocess/timestamp_unit" value="0"/>
+    <rosparam param="/mapping/extrinsic_T">[0.0, 0.0, -0.025]</rosparam>
+    <rosparam param="/mapping/extrinsic_R">[1.0, 0.0, 0.0,
+                                             0.0, 1.0, 0.0,
+                                             0.0, 0.0, 1.0]</rosparam>
+  </group>
+
+  <include if="$(arg start_control)"
+           file="$(find diff_tracked_control)/launch/straight_line_control.launch">
+    <arg name="distance" value="$(arg distance)"/>
+    <arg name="speed" value="$(arg speed)"/>
+    <arg name="odom_topic" value="$(arg odom_topic)"/>
+  </include>
+</launch>

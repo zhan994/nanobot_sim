@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<robot name="tracked_imu" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- Installation pose relative to base_link. Adjust these values to the
+       measured IMU extrinsics on the real robot. -->
+  <xacro:property name="imu_size" value="0.05" />
+  <xacro:property name="imu_x" value="0.0"/>
+  <xacro:property name="imu_y" value="0.0"/>
+  <xacro:property name="imu_z" value="${laser_length / 2 + imu_size / 2}"/>
+
+  <link name="imu_link">
+    <inertial>
+      <mass value="0.05"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.00000469" ixy="0" ixz="0"
+               iyy="0.00000760" iyz="0" izz="0.00001042"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${imu_size} ${imu_size} ${imu_size}"/>
+      </geometry>
+      <material name="imu_red">
+        <color rgba="0.8 0.1 0.1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${imu_size} ${imu_size} ${imu_size}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="imu_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="imu_link"/>
+    <origin xyz="${imu_x} ${imu_y} ${imu_z}" rpy="0 0 0"/>
+  </joint>
+
+  <gazebo reference="imu_link">
+    <material>Gazebo/Red</material>
+  </gazebo>
+</robot>

@@ -1,0 +1,25 @@
+<launch>
+  <arg name="rviz" default="true"/>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find diff_tracked_gazebo)/worlds/iscas_museum.world"/>
+  </include>
+
+  <!-- Load the URDF into the ROS Parameter Server -->
+  <param name="robot_description" command="$(find xacro)/xacro  '$(find diff_tracked_gazebo)/urdf/bunker.xacro'" /> 
+
+  <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+	args="-unpause -urdf -model bunker -param robot_description -x 0.0 -y 0.0 -z 0.0"/> 
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" />
+
+  <node if="$(arg rviz)"
+      pkg="rviz"
+      type="rviz"
+      name="rviz"
+      args="-d $(find diff_tracked_gazebo)/rviz/display.rviz">
+  <env name="LIBGL_ALWAYS_SOFTWARE" value="1"/>
+</node>
+
+</launch>
