@@ -88,8 +88,8 @@ git clone -b feature_uav https://github.com/zhan994/nanobot_sim.git
 2. 移动模型
 
 ```
-cp -r ~/nanobot_sim/quad_uav/quad_uav_gazebo/models/* ~/px4_dev/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models
-cp -r ~/nanobot_sim/quad_uav/quad_uav_gazebo/worlds/* ~/px4_dev/Tools/simulation/gazebo-classic/sitl_gazebo-classic/worlds
+cp -r ~/nanobot_ws/src/nanobot_sim/quad_uav/quad_uav_gazebo/models/* ~/px4_dev/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models
+cp -r ~/nanobot_ws/src/nanobot_sim/quad_uav/quad_uav_gazebo/worlds/* ~/px4_dev/Tools/simulation/gazebo-classic/sitl_gazebo-classic/worlds
 ```
 
 3. 安装依赖

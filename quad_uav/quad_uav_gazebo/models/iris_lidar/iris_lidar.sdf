@@ -12,15 +12,15 @@
         Mounted on top, slightly forward of the vehicle center. A positive
         pitch rotates the lidar's +Z axis toward +X, i.e. 45 degrees forward.
       -->
-      <pose>0.05 0 0.12 0 0.785398 0</pose>
+      <pose>0.10 0 0.15 0 0.785398 0</pose>
 
       <inertial>
-        <!-- Intentionally massless so the sensor does not affect flight control. -->
-        <mass>0.0</mass>
+        <!-- ODE requires every dynamic link to have a positive mass. -->
+        <mass>0.001</mass>
         <inertia>
-          <ixx>1e-12</ixx>
-          <iyy>1e-12</iyy>
-          <izz>1e-12</izz>
+          <ixx>1.1e-6</ixx>
+          <iyy>1.1e-6</iyy>
+          <izz>1.35e-6</izz>
         </inertia>
       </inertial>
 
