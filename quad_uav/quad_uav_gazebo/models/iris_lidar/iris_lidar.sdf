@@ -1,0 +1,88 @@
+<?xml version="1.0" ?>
+<sdf version='1.6'>
+  <model name='iris_lidar'>
+
+    <include>
+      <uri>model://iris</uri>
+    </include>
+
+    <!-- VLP-16-like 3D lidar built from Gazebo's native multi-ray sensor. -->
+    <link name="lidar_link">
+      <!--
+        Mounted on top, slightly forward of the vehicle center. A positive
+        pitch rotates the lidar's +Z axis toward +X, i.e. 45 degrees forward.
+      -->
+      <pose>0.05 0 0.12 0 0.785398 0</pose>
+
+      <inertial>
+        <!-- Intentionally massless so the sensor does not affect flight control. -->
+        <mass>0.0</mass>
+        <inertia>
+          <ixx>1e-12</ixx>
+          <iyy>1e-12</iyy>
+          <izz>1e-12</izz>
+        </inertia>
+      </inertial>
+
+      <visual name="lidar_visual">
+        <geometry>
+          <cylinder>
+            <radius>0.052</radius>
+            <length>0.071</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.04 0.12 0.18 1</ambient>
+          <diffuse>0.08 0.28 0.42 1</diffuse>
+        </material>
+      </visual>
+
+      <sensor name="velodyne_vlp16" type="ray">
+        <always_on>1</always_on>
+        <update_rate>10</update_rate>
+        <!-- Ray visualization is disabled to reduce GUI/rendering overhead. -->
+        <visualize>false</visualize>
+        <ray>
+          <scan>
+            <horizontal>
+              <!-- 1 degree azimuth resolution: 5760 points per scan. -->
+              <samples>360</samples>
+              <resolution>1</resolution>
+              <min_angle>-3.141593</min_angle>
+              <max_angle>3.141593</max_angle>
+            </horizontal>
+            <vertical>
+              <samples>96</samples>
+              <resolution>1</resolution>
+              <min_angle>0</min_angle>
+              <max_angle>1.57</max_angle>
+            </vertical>
+          </scan>
+          <range>
+            <min>0.3</min>
+            <max>100.0</max>
+            <resolution>0.002</resolution>
+          </range>
+        </ray>
+
+        <!-- Publishes sensor_msgs/PointCloud2 directly. -->
+        <plugin name="velodyne_ros_laser" filename="libgazebo_ros_velodyne_laser.so">
+          <robotNamespace>/</robotNamespace>
+          <topicName>/velodyne_points</topicName>
+          <frameName>velodyne</frameName>
+          <organize_cloud>false</organize_cloud>
+          <min_range>0.3</min_range>
+          <max_range>100.0</max_range>
+          <min_intensity>0.0</min_intensity>
+          <gaussianNoise>0.008</gaussianNoise>
+        </plugin>
+      </sensor>
+    </link>
+
+    <joint name="lidar_joint" type="fixed">
+      <child>lidar_link</child>
+      <parent>iris::base_link</parent>
+    </joint>
+  </model>
+</sdf>
+<!-- vim: set noet fenc=utf-8 ff=unix sts=0 sw=4 ts=4 : -->
