@@ -102,15 +102,40 @@ sudo apt install ros-noetic-velodyne-gazebo-plugins
 
 ## Step 3: PX4 SITL 环境启动
 
-1. 给可执行权限
+1. 赋予执行权限
 ```
 cd nanobot_sim/quad_uav
-sudo chmod +x  ./quad_uav_base/sh/rspx4sitl.sh
+sudo chmod +x  ./quad_uav_base/*
 ```
 
-2. 启动脚本
+2. 启动 px4-sitl
 
 ```
 cd nanobot_sim/quad_uav
-./quad_uav_base/sh/rspx4sitl.sh
+./quad_uav_base/rspx4sitl_beta.sh
 ```
+
+3. 启动点云转换
+
+> 使用脚本将雷达系点云旋转至Body系
+
+```
+cd nanobot_sim/quad_uav
+python3 ./quad_uav_base/pointcloud_to_body.py
+```
+
+4. **结束后**清理环境
+
+```
+cd nanobot_sim/quad_uav
+./quad_uav_base/clean_env.sh
+```
+
+
+## Step 4：Diff-Planner
+
+0. 安装依赖 
+
+1. 编译代码
+
+2. 启动
