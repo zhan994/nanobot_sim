@@ -11,7 +11,7 @@
 
   <depend>geometry_msgs</depend>
   <depend>nav_msgs</depend>
-  <depend>rospy</depend>
+  <depend>roscpp</depend>
 
   <export/>
 </package>

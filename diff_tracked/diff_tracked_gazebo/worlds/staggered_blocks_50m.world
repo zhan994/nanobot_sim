@@ -1,0 +1,160 @@
+<?xml version="1.0" ?>
+<sdf version="1.7">
+  <world name="staggered_blocks_50m">
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <physics name="default_physics" type="ode">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+      <gravity>0 0 -9.8</gravity>
+    </physics>
+
+    <!--
+      25 one-metre cubes over a 50 m course.
+      Cube centres are 2 m apart along X and alternate between Y = +/-1.5 m.
+      Their inner faces are at Y = +/-1 m, leaving a 2 m clear centre lane.
+    -->
+    <model name="staggered_blocks">
+      <static>true</static>
+
+      <link name="block_01">
+        <pose>1 -1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_02">
+        <pose>3 1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_03">
+        <pose>5 -1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_04">
+        <pose>7 1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_05">
+        <pose>9 -1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_06">
+        <pose>11 1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_07">
+        <pose>13 -1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_08">
+        <pose>15 1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_09">
+        <pose>17 -1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_10">
+        <pose>19 1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_11">
+        <pose>21 -1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_12">
+        <pose>23 1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_13">
+        <pose>25 -1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_14">
+        <pose>27 1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_15">
+        <pose>29 -1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_16">
+        <pose>31 1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_17">
+        <pose>33 -1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_18">
+        <pose>35 1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_19">
+        <pose>37 -1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_20">
+        <pose>39 1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_21">
+        <pose>41 -1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_22">
+        <pose>43 1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_23">
+        <pose>45 -1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_24">
+        <pose>47 1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+      <link name="block_25">
+        <pose>49 -1.5 0.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 1</size></box></geometry><material><ambient>0.9 0.35 0.05 1</ambient><diffuse>0.9 0.35 0.05 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <gui fullscreen="0">
+      <camera name="user_camera">
+        <pose>-8 -18 18 0 0.55 0.65</pose>
+        <view_controller>orbit</view_controller>
+      </camera>
+    </gui>
+  </world>
+</sdf>

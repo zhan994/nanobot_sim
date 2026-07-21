@@ -51,3 +51,7 @@ qtcreator-*
 CATKIN_IGNORE
 .vscode/
 .catkin_workspace
+
+!/.gitignore
+!/diff_tracked/
+!/diff_tracked/**

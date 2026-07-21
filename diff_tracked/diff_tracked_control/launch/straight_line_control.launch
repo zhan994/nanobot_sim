@@ -1,25 +1,38 @@
 <launch>
-  <arg name="distance" default="5.0"/>
-  <arg name="speed" default="0.5"/>
-  <arg name="odom_topic" default="/Odometry"/>
+  <arg name="distance" default="45.0"/>
+  <arg name="speed" default="0.8"/>
+  <arg name="odom_topic" default="/odom"/>
 
   <node pkg="diff_tracked_control"
-        type="straight_line_controller.py"
+        type="straight_line_controller_node"
         name="straight_line_controller"
         output="screen">
     <param name="odom_topic" value="$(arg odom_topic)"/>
     <param name="cmd_vel_topic" value="/cmd_vel"/>
+    <param name="planned_path_topic" value="/planned_path"/>
+    <param name="actual_path_topic" value="/actual_path"/>
+    <param name="planned_path_resolution" value="0.25"/>
+    <param name="actual_path_min_distance" value="0.05"/>
+    <param name="actual_path_max_poses" value="2000"/>
     <param name="target_distance" value="$(arg distance)"/>
     <param name="cruise_speed" value="$(arg speed)"/>
-    <param name="distance_kp" value="1.0"/>
-    <param name="distance_ki" value="0.0"/>
-    <param name="distance_kd" value="0.05"/>
-    <param name="steering_kp" value="2.5"/>
-    <param name="steering_ki" value="0.0"/>
-    <param name="steering_kd" value="0.15"/>
-    <param name="lookahead_distance" value="0.5"/>
-    <param name="max_angular_speed" value="1.0"/>
-    <param name="distance_tolerance" value="0.03"/>
+
+    <param name="lookahead_distance" value="1.0"/>
+    <param name="min_lookahead_distance" value="0.8"/>
+    <param name="max_lookahead_distance" value="2.5"/>
+    <param name="lookahead_time" value="1.5"/>
+
+    <param name="regulated_min_radius" value="2.0"/>
+    <param name="max_lateral_accel" value="0.5"/>
+    <param name="approach_distance" value="3.0"/>
+    <param name="min_linear_speed" value="0.05"/>
+    <param name="max_linear_accel" value="0.4"/>
+    <param name="max_linear_decel" value="0.6"/>
+    <param name="max_angular_speed" value="0.5"/>
+    <param name="max_angular_accel" value="1.0"/>
+
+    <param name="distance_tolerance" value="0.08"/>
+    <param name="odom_timeout" value="1.0"/>
     <param name="control_rate" value="20.0"/>
   </node>
 </launch>

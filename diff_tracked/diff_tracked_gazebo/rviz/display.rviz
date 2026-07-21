@@ -49,8 +49,54 @@ Visualization Manager:
         Y: 0
         Z: 0
       Plane: XY
-      Plane Cell Count: 10
+      Plane Cell Count: 60
       Reference Frame: <Fixed Frame>
+      Value: true
+    - Alpha: 1
+      Buffer Length: 1
+      Class: rviz/Path
+      Color: 0; 255; 0
+      Enabled: true
+      Head Diameter: 0.3
+      Head Length: 0.2
+      Length: 0.3
+      Line Style: Billboards
+      Line Width: 0.07999999821186066
+      Name: Planned 50 m Path
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0.03
+      Pose Color: 0; 255; 0
+      Pose Style: None
+      Radius: 0.03
+      Shaft Diameter: 0.1
+      Shaft Length: 0.1
+      Topic: /planned_path
+      Unreliable: false
+      Value: true
+    - Alpha: 1
+      Buffer Length: 1
+      Class: rviz/Path
+      Color: 255; 200; 0
+      Enabled: true
+      Head Diameter: 0.3
+      Head Length: 0.2
+      Length: 0.3
+      Line Style: Billboards
+      Line Width: 0.10000000149011612
+      Name: Actual Tracked Path
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0.06
+      Pose Color: 255; 200; 0
+      Pose Style: None
+      Radius: 0.03
+      Shaft Diameter: 0.1
+      Shaft Length: 0.1
+      Topic: /actual_path
+      Unreliable: false
       Value: true
     - Alpha: 1
       Class: rviz/RobotModel
@@ -185,7 +231,7 @@ Visualization Manager:
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: base_link
+    Fixed Frame: camera_init
     Frame Rate: 30
   Name: root
   Tools:
@@ -209,14 +255,14 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 2.4508087635040283
+      Distance: 35
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0
+        X: 20
         Y: 0
         Z: 0
       Focal Shape Fixed Size: true
@@ -224,7 +270,7 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.3553979694843292
+      Pitch: 0.75
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
       Yaw: 5.2885847091674805
@@ -247,4 +293,3 @@ Window Geometry:
   Width: 1920
   X: 0
   Y: 0
-

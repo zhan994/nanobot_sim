@@ -11,6 +11,7 @@
 
   <exec_depend>diff_tracked_gazebo</exec_depend>
   <exec_depend>diff_tracked_control</exec_depend>
+  <exec_depend>rviz</exec_depend>
 
   <export/>
 </package>

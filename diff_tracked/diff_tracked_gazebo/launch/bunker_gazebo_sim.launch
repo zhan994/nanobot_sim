@@ -1,18 +1,21 @@
 <launch>
   <arg name="rviz" default="true"/>
+  <!-- The lowest wheel collision is about 0.353 m below base_link. -->
+  <arg name="spawn_z" default="0.40"/>
+  <arg name="world_name" default="$(find diff_tracked_gazebo)/worlds/staggered_blocks_50m.world"/>
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find diff_tracked_gazebo)/worlds/iscas_museum.world"/>
+    <arg name="world_name" value="$(arg world_name)"/>
   </include>
 
   <!-- Load the URDF into the ROS Parameter Server -->
-  <param name="robot_description" command="$(find xacro)/xacro  '$(find diff_tracked_gazebo)/urdf/bunker.xacro'" /> 
+  <param name="robot_description" command="$(find xacro)/xacro '$(find diff_tracked_gazebo)/urdf/bunker.xacro'"/>
 
   <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
   <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
-	args="-unpause -urdf -model bunker -param robot_description -x 0.0 -y 0.0 -z 0.0"/> 
+        args="-unpause -urdf -model bunker -param robot_description 
+         -x 0.0 -y 0.0 -z $(arg spawn_z) "/>
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
-  <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" />
 
   <node if="$(arg rviz)"
       pkg="rviz"
