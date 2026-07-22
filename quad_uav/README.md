@@ -136,6 +136,59 @@ cd nanobot_sim/quad_uav
 
 0. 安装依赖 
 
+```
+sudo apt install -y libompl-dev libfmt-dev libeigen3-dev ros-noetic-rosfmt
+```
+
 1. 编译代码
 
+```
+mkdir -p ~/nanobot_ws/src/nanobot_sim/quad_uav/quad_uav_planner
+cd ~/nanobot_ws/src/nanobot_sim/quad_uav/quad_uav_planner
+git clone -b dev_nanobot https://github.com/zhan994/Diff-Planner.git
+cd ~/nanobot_ws
+catkin_make
+```
+
 2. 启动
+
+下面需要多窗口:
+
+- Terminal 1: 启动px4sitl
+```
+cd ~/nanobot_ws && source devel/setup.bash
+roscd quad_uav_gazebo/
+./scripts/rspx4.sh
+```
+> 记得 chmod +x 给权限
+
+- Terminal 2: 启动px4ctrl
+
+```
+cd ~/nanobot_ws && source devel/setup.bash
+roslaunch px4ctrl run_ctrl_sim.launch
+````
+
+- Terminal 3: 启动 rc sim
+
+```
+cd ~/nanobot_ws && source devel/setup.bash
+rosrun quad_uav_gazebo rc_sim.py
+````
+> 输入 '1' 起飞
+
+- Terminal 4: 启动点云转换
+
+```
+cd ~/nanobot_ws && source devel/setup.bash
+rosrun  quad_uav_gazebo pointcloud_to_body.py
+```
+
+- Terminal 5: 启动 planner
+
+```
+cd ~/nanobot_ws && source devel/setup.bash
+roslaunch diff_planner gz_single_drone.launch
+```
+
+> 先起飞，进入悬停后 rviz 使用 2D Goal 进行指点飞行
