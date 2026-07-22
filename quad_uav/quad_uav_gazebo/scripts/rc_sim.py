@@ -60,7 +60,7 @@ class RCTrigger:
         self.current_vel = None
 
         self.pub = rospy.Publisher('/mavros/rc/in_sim', RCIn, queue_size=10)
-        self.cmdpub = rospy.Publisher('/position_cmd', PositionCommand, queue_size=10)
+        self.cmdpub = rospy.Publisher('/setpoints_cmd', PositionCommand, queue_size=10)
         self.odom_sub = rospy.Subscriber('/mavros/local_position/odom', Odometry, self.odom_callback, queue_size=10)
         
         self.timer = rospy.Timer(rospy.Duration(1/30), self.timer_callback)
