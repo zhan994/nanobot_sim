@@ -13,10 +13,13 @@ EXTRA_WS_SETUP="${EXTRA_WS_SETUP:-}"
 # 两者都未设置时，默认加载本包自带的无人机训练场。
 WORLD_FILE="${WORLD_FILE:-}"
 WORLD_NAME="${WORLD_NAME:-}"
-SDF_NAME="${SDF_NAME:-iris_lidar/iris_lidar.sdf}"
-GUI_ENABLE="${GUI_ENABLE:-true}"
+SDF_NAME="${SDF_NAME:-iris_lidar_light/iris_lidar_light.sdf}"
+GUI_ENABLE="${GUI_ENABLE:-false}"
 PX4_SIM_SPEED="${PX4_SIM_SPEED:-1.0}"
 LAUNCH_FILE="${LAUNCH_FILE:-mavros_posix_sitl.launch}"
+SPAWN_X="${SPAWN_X:-0.0}"
+SPAWN_Y="${SPAWN_Y:-0.0}"
+SPAWN_Z="${SPAWN_Z:-0.1}"
 
 # 0: 不配置；1: px4-mavlink stream；2: MAVROS mavcmd
 STREAM_CONFIG_METHOD="${STREAM_CONFIG_METHOD:-2}"
@@ -32,7 +35,7 @@ MAVROS_CONNECT_TIMEOUT_SEC="${MAVROS_CONNECT_TIMEOUT_SEC:-90}"
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 PACKAGE_DIR="$(cd -- "$SCRIPT_DIR/.." && pwd)"
-DEFAULT_WORLD_FILE="$PACKAGE_DIR/worlds/uav_complex_120m.world"
+DEFAULT_WORLD_FILE="$PACKAGE_DIR/worlds/uav_training.world"
 
 PX4_BUILD_DIR="$PX4_DIR/build/px4_sitl_default"
 PX4_MAVLINK_BIN="$PX4_BUILD_DIR/bin/px4-mavlink"
@@ -123,7 +126,12 @@ else
     WORLD_PATH="$DEFAULT_WORLD_FILE"
 fi
 
-SDF_PATH="$GAZEBO_PKG_PATH/models/$SDF_NAME"
+PACKAGE_SDF_PATH="$PACKAGE_DIR/models/$SDF_NAME"
+if [[ -f "$PACKAGE_SDF_PATH" ]]; then
+    SDF_PATH="$PACKAGE_SDF_PATH"
+else
+    SDF_PATH="$GAZEBO_PKG_PATH/models/$SDF_NAME"
+fi
 
 [[ -f "$WORLD_PATH" ]] || { echo "Error: world 文件不存在: $WORLD_PATH" >&2; exit 1; }
 [[ -f "$SDF_PATH" ]] || { echo "Error: SDF 文件不存在: $SDF_PATH" >&2; exit 1; }
@@ -142,9 +150,9 @@ setsid env PATH="$ROS_EXEC_PATH" PX4_SIM_SPEED_FACTOR="$PX4_SIM_SPEED" \
     sdf:="$SDF_PATH" \
     gui:="$GUI_ENABLE" \
     interactive:=false \
-    x:=0.0 \
-    y:=0.0 \
-    z:=0.1 &
+    x:="$SPAWN_X" \
+    y:="$SPAWN_Y" \
+    z:="$SPAWN_Z" &
 ROSLAUNCH_PID=$!
 
 # -----------------------------------------------------------------------------

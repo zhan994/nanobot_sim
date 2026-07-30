@@ -7,6 +7,7 @@
 - ros1 noetic
 
 > 实验环境：WSL2 CPU=Intel 14900HX; GPU=Nvidia RTX4090Laptop; RAM=32GB
+> 如有安装Anaconda，启动前，请先退出 conda env : 多次执行 `conda deactivate`
 
 
 ### 1. 依赖安装
@@ -162,7 +163,26 @@ cd ~/nanobot_ws && source devel/setup.bash
 roscd quad_uav_gazebo/
 ./scripts/rspx4.sh
 ```
-> 记得 chmod +x 给权限
+> 也可自定义参数，例如：
+> 使用120m场景或Airylike雷达时计算量较大，可以开启无GUI模式 `GUI_ENABLE=false`
+```
+SDF_NAME=iris_lidar_light/iris_lidar_light.sdf \
+GUI_ENABLE=false \
+./scripts/rspx4.sh
+```
+
+复杂 CPU-ray 场景可选择独立的 mini 雷达：
+
+```bash
+SDF_NAME=iris_lidar_mini/iris_lidar_mini.sdf \
+GUI_ENABLE=false \
+./scripts/rspx4.sh
+```
+
+mini 配置为 `90 × 48 @ 5 Hz`、量程 `30 m`，输出话题仍为
+`/velodyne_points`。
+
+> 第一次使用 请 chmod +x 给权限
 `chmod +x ./scripts/rspx4.sh`
 
 - Terminal 2: 启动px4ctrl
@@ -176,9 +196,10 @@ roslaunch px4ctrl run_ctrl_sim.launch
 
 ```
 cd ~/nanobot_ws && source devel/setup.bash
-rosrun quad_uav_gazebo rc_sim.py
+rosrun quad_uav_gazebo uav_cli.py
 ```
-> 输入 '1' 起飞
+> 输入 '?' 查看 help
+> 也可使用原版：rc_sim.py
 
 - Terminal 4: 启动点云转换
 
@@ -191,7 +212,16 @@ rosrun quad_uav_gazebo pointcloud_to_body.py
 
 ```
 cd ~/nanobot_ws && source devel/setup.bash
-roslaunch diff_planner gz_single_drone.launch
+roslaunch diff_planner gz_single_drone.launch enable_rviz:=true
+```
+```
+roslaunch diff_planner gz_single_drone.launch enable_rviz:=true 2>&1 \
+  | tee ~/intern/raycast_log/120_env/13_airylike_252505.log
 ```
 
-> 先起飞，进入悬停后在 rviz 使用 2D Nav Goal 进行指点飞行, 可以使用Gazebo中的物体制造障碍飞行环境
+> 先起飞，进入悬停后在 rviz 使用 2D Nav Goal 进行指点飞行，也可使用 uav_cli.py `gl x y z` 发布三维坐标
+可以使用Gazebo中的物体制造障碍飞行环境
+> 由于无 world->map 的 tf 坐标变换，而 Diffplanner 硬编码了原点为 world 坐标系，所以发布 world->map 的 tf 坐标变换
+```
+cd ~/nanobot_ws && source devel/setup.bash && roslaunch quad_uav_gazebo map_world_tf.launch
+```
