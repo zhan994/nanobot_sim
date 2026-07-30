@@ -9,7 +9,10 @@ set -Eeuo pipefail
 PX4_DIR="${PX4_DIR:-$HOME/px4_dev}"
 EXTRA_WS_SETUP="${EXTRA_WS_SETUP:-}"
 
-WORLD_NAME="${WORLD_NAME:-empty.world}"
+# WORLD_FILE 可直接指定任意 world 文件；WORLD_NAME 用于选择 PX4 内置场景。
+# 两者都未设置时，默认加载本包自带的无人机训练场。
+WORLD_FILE="${WORLD_FILE:-}"
+WORLD_NAME="${WORLD_NAME:-}"
 SDF_NAME="${SDF_NAME:-iris_lidar/iris_lidar.sdf}"
 GUI_ENABLE="${GUI_ENABLE:-true}"
 PX4_SIM_SPEED="${PX4_SIM_SPEED:-1.0}"
@@ -20,17 +23,27 @@ STREAM_CONFIG_METHOD="${STREAM_CONFIG_METHOD:-2}"
 STREAM_TARGET_RATE_HZ="${STREAM_TARGET_RATE_HZ:-200}"
 PX4_MAVLINK_UDP_PORT="${PX4_MAVLINK_UDP_PORT:-14580}"
 
-# 等待 MAVROS 与 PX4 建立连接的最长时间
-MAVROS_CONNECT_TIMEOUT_SEC="${MAVROS_CONNECT_TIMEOUT_SEC:-60}"
+# 高分辨率雷达机模首次生成可能需要约 45 秒，预留足够启动余量。
+MAVROS_CONNECT_TIMEOUT_SEC="${MAVROS_CONNECT_TIMEOUT_SEC:-90}"
 
 # -----------------------------------------------------------------------------
 # 2. 计算 PX4 内部路径，并注册退出清理逻辑
 # -----------------------------------------------------------------------------
 
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+PACKAGE_DIR="$(cd -- "$SCRIPT_DIR/.." && pwd)"
+DEFAULT_WORLD_FILE="$PACKAGE_DIR/worlds/uav_complex_120m.world"
+
 PX4_BUILD_DIR="$PX4_DIR/build/px4_sitl_default"
 PX4_MAVLINK_BIN="$PX4_BUILD_DIR/bin/px4-mavlink"
 GAZEBO_SETUP_SCRIPT="$PX4_DIR/Tools/simulation/gazebo-classic/setup_gazebo.bash"
 ROSLAUNCH_PID=""
+
+# 部分 ROS 工具（例如 gazebo_ros/spawn_model 和 mavros/mavcmd）使用
+# `#!/usr/bin/env python3`。在 Conda 环境中直接启动时，它们会误用 Conda
+# Python，进而无法导入 Ubuntu/ROS 安装的 rospkg、rospy。让本脚本启动的
+# 整个 ROS 进程树优先使用系统 Python，同时保留其余用户 PATH。
+ROS_EXEC_PATH="/usr/bin:/bin:${PATH}"
 
 # roslaunch 在独立进程组中运行，退出脚本时只清理本脚本启动的进程。
 cleanup() {
@@ -80,12 +93,18 @@ export ROS_PACKAGE_PATH="${ROS_PACKAGE_PATH:-}"
 # shellcheck disable=SC1090
 source "$GAZEBO_SETUP_SCRIPT" "$PX4_DIR" "$PX4_BUILD_DIR"
 export ROS_PACKAGE_PATH="$ROS_PACKAGE_PATH:$PX4_DIR:$PX4_DIR/Tools/simulation/gazebo-classic/sitl_gazebo-classic"
+export GAZEBO_MODEL_PATH="$PACKAGE_DIR/models:$GAZEBO_MODEL_PATH"
 
 command -v roslaunch >/dev/null 2>&1 || { echo "Error: 未找到 roslaunch，请先 source ROS 1 环境" >&2; exit 1; }
 command -v rospack >/dev/null 2>&1 || { echo "Error: 未找到 rospack，请先 source ROS 1 环境" >&2; exit 1; }
 command -v rostopic >/dev/null 2>&1 || { echo "Error: 未找到 rostopic，请先 source ROS 1 环境" >&2; exit 1; }
 command -v setsid >/dev/null 2>&1 || { echo "Error: 未找到 setsid 命令" >&2; exit 1; }
 command -v timeout >/dev/null 2>&1 || { echo "Error: 未找到 timeout 命令" >&2; exit 1; }
+
+env PATH="$ROS_EXEC_PATH" python3 -c 'import rospkg, rospy' >/dev/null 2>&1 || {
+    echo "Error: 系统 Python 无法导入 rospkg/rospy，请检查 ROS Noetic 的 Python 安装" >&2
+    exit 1
+}
 
 if [[ "$STREAM_CONFIG_METHOD" == "2" ]]; then
     command -v rosrun >/dev/null 2>&1 || { echo "Error: 未找到 rosrun，请先 source ROS 1 环境" >&2; exit 1; }
@@ -96,7 +115,14 @@ GAZEBO_PKG_PATH="$(rospack find mavlink_sitl_gazebo 2>/dev/null)" || {
     exit 1
 }
 
-WORLD_PATH="$GAZEBO_PKG_PATH/worlds/$WORLD_NAME"
+if [[ -n "$WORLD_FILE" ]]; then
+    WORLD_PATH="$WORLD_FILE"
+elif [[ -n "$WORLD_NAME" ]]; then
+    WORLD_PATH="$GAZEBO_PKG_PATH/worlds/$WORLD_NAME"
+else
+    WORLD_PATH="$DEFAULT_WORLD_FILE"
+fi
+
 SDF_PATH="$GAZEBO_PKG_PATH/models/$SDF_NAME"
 
 [[ -f "$WORLD_PATH" ]] || { echo "Error: world 文件不存在: $WORLD_PATH" >&2; exit 1; }
@@ -110,7 +136,7 @@ echo ">> 启动 PX4 SITL"
 echo ">> world: $WORLD_PATH"
 echo ">> model: $SDF_PATH"
 
-setsid env PX4_SIM_SPEED_FACTOR="$PX4_SIM_SPEED" \
+setsid env PATH="$ROS_EXEC_PATH" PX4_SIM_SPEED_FACTOR="$PX4_SIM_SPEED" \
     roslaunch px4 "$LAUNCH_FILE" \
     world:="$WORLD_PATH" \
     sdf:="$SDF_PATH" \
@@ -174,9 +200,9 @@ elif [[ "$STREAM_CONFIG_METHOD" == "2" ]]; then
         exit 1
     }
 
-    rosrun mavros mavcmd long 511 105 "$STREAM_TARGET_INTERVAL_US" 0 0 0 0 0
-    rosrun mavros mavcmd long 511 31 "$STREAM_TARGET_INTERVAL_US" 0 0 0 0 0
-    rosrun mavros mavcmd long 511 32 "$STREAM_TARGET_INTERVAL_US" 0 0 0 0 0
+    env PATH="$ROS_EXEC_PATH" rosrun mavros mavcmd long 511 105 "$STREAM_TARGET_INTERVAL_US" 0 0 0 0 0
+    env PATH="$ROS_EXEC_PATH" rosrun mavros mavcmd long 511 31 "$STREAM_TARGET_INTERVAL_US" 0 0 0 0 0
+    env PATH="$ROS_EXEC_PATH" rosrun mavros mavcmd long 511 32 "$STREAM_TARGET_INTERVAL_US" 0 0 0 0 0
 
 else
     echo ">> 不修改 MAVLink 消息频率"

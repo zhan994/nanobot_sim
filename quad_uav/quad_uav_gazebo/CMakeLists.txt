@@ -9,12 +9,14 @@ catkin_package()
 catkin_install_python(PROGRAMS
   scripts/pointcloud_to_body.py
   scripts/rc_sim.py
+  scripts/uav_cli.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 # Keep Gazebo resources available from the package share directory in an
 # install space as well as directly from the source space.
 install(DIRECTORY
+  launch
   models
   worlds
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}

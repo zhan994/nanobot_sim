@@ -13,7 +13,8 @@ according to ``PointCloud2.header.frame_id``.
 
 All PointCloud2 fields (for example, intensity and ring) and the timestamp
 are preserved. The output is unorganized because points inside the configurable
-body exclusion sphere are removed.
+body exclusion sphere are removed. An optional world-coordinate wire dropout
+model can also remove returns from the power lines in ``uav_complex_120m``.
 
 Example:
     rosrun <your_package> pointcloud_to_body.py \
@@ -81,6 +82,181 @@ def _quaternion_matrix(x: float, y: float, z: float, w: float) -> np.ndarray:
     )
 
 
+class WireDropoutModel:
+    """Apply spatially and temporally correlated dropout to straight wires.
+
+    The model is deliberately based on world-space geometry rather than point
+    intensity: Gazebo Classic's Velodyne plugin treats ``min_intensity`` as a
+    floor, so it is not a return-rejection threshold.
+    """
+
+    def __init__(
+        self,
+        wire_lines,
+        x_min: float,
+        x_max: float,
+        detection_radius: float,
+        segment_length: float,
+        near_detection_probability: float,
+        range_decay: float,
+        temporal_persistence: float,
+        segment_on_probability: float,
+        hidden_probability_scale: float,
+        angle_floor: float,
+        pole_x,
+        pole_exclusion_half_width: float,
+        seed: int,
+    ) -> None:
+        lines = np.asarray(wire_lines, dtype=np.float64)
+        if lines.ndim != 2 or lines.shape[1] != 2 or lines.shape[0] == 0:
+            raise ValueError("~wire_lines must contain one or more [world_y, world_z] pairs")
+        if not np.all(np.isfinite(lines)):
+            raise ValueError("~wire_lines must contain only finite values")
+        if not x_min < x_max:
+            raise ValueError("~wire_x_min must be smaller than ~wire_x_max")
+        if detection_radius <= 0.0:
+            raise ValueError("~wire_detection_radius must be positive")
+        if segment_length <= 0.0:
+            raise ValueError("~wire_segment_length must be positive")
+        if range_decay <= 0.0:
+            raise ValueError("~wire_range_decay must be positive")
+        for name, value in (
+            ("~wire_near_detection_probability", near_detection_probability),
+            ("~wire_temporal_persistence", temporal_persistence),
+            ("~wire_segment_on_probability", segment_on_probability),
+            ("~wire_hidden_probability_scale", hidden_probability_scale),
+            ("~wire_angle_floor", angle_floor),
+        ):
+            if not 0.0 <= value <= 1.0:
+                raise ValueError("{} must be in [0, 1]".format(name))
+        if pole_exclusion_half_width < 0.0:
+            raise ValueError("~wire_pole_exclusion_half_width must be non-negative")
+
+        poles = np.asarray(pole_x, dtype=np.float64)
+        if poles.ndim != 1 or not np.all(np.isfinite(poles)):
+            raise ValueError("~wire_pole_x must contain finite x coordinates")
+
+        self.lines = lines
+        self.x_min = float(x_min)
+        self.x_max = float(x_max)
+        self.radius_squared = float(detection_radius) ** 2
+        self.segment_length = float(segment_length)
+        self.near_probability = float(near_detection_probability)
+        self.range_decay = float(range_decay)
+        self.persistence = float(temporal_persistence)
+        self.on_probability = float(segment_on_probability)
+        self.hidden_scale = float(hidden_probability_scale)
+        self.angle_floor = float(angle_floor)
+        self.pole_x = poles
+        self.pole_exclusion_half_width = float(pole_exclusion_half_width)
+        self.rng = np.random.RandomState(int(seed))
+        self.segment_states = {}
+
+    def _update_segment_states(self, keys):
+        """Return one correlated on/off state for every unique segment key."""
+        states = {}
+        off_to_on = (1.0 - self.persistence) * self.on_probability
+        on_to_off = (1.0 - self.persistence) * (1.0 - self.on_probability)
+        for key in keys:
+            key_tuple = (int(key[0]), int(key[1]))
+            if key_tuple in self.segment_states:
+                previous = self.segment_states[key_tuple]
+            else:
+                previous = bool(self.rng.random_sample() < self.on_probability)
+            transition_probability = on_to_off if previous else off_to_on
+            current = (
+                not previous
+                if self.rng.random_sample() < transition_probability
+                else previous
+            )
+            self.segment_states[key_tuple] = current
+            states[key_tuple] = current
+        return states
+
+    def keep_mask(
+        self,
+        world_x: np.ndarray,
+        world_y: np.ndarray,
+        world_z: np.ndarray,
+        valid: np.ndarray,
+        sensor_origin: np.ndarray,
+    ):
+        """Return the updated valid mask and wire candidate/retained counts."""
+        in_x_range = (world_x >= self.x_min) & (world_x <= self.x_max)
+
+        # Pick the closest of the configured parallel power lines.
+        distance_squared = np.stack(
+            [
+                (world_y - line_y) ** 2 + (world_z - line_z) ** 2
+                for line_y, line_z in self.lines
+            ],
+            axis=0,
+        )
+        closest_line = np.argmin(distance_squared, axis=0)
+        closest_distance_squared = np.take_along_axis(
+            distance_squared, closest_line[np.newaxis, ...], axis=0
+        )[0]
+        candidates = valid & in_x_range & (closest_distance_squared <= self.radius_squared)
+
+        # The ray return does not identify its collision object. Preserve points
+        # close to poles so their tops are not mistaken for wire returns.
+        if self.pole_x.size and self.pole_exclusion_half_width > 0.0:
+            near_pole = np.zeros_like(candidates)
+            for pole in self.pole_x:
+                near_pole |= np.abs(world_x - pole) <= self.pole_exclusion_half_width
+            candidates &= ~near_pole
+
+        rows, columns = np.nonzero(candidates)
+        candidate_count = len(rows)
+        if candidate_count == 0:
+            return valid, 0, 0
+
+        candidate_x = world_x[rows, columns]
+        candidate_y = world_y[rows, columns]
+        candidate_z = world_z[rows, columns]
+        candidate_lines = closest_line[rows, columns]
+        segment_indices = np.floor(
+            (candidate_x - self.x_min) / self.segment_length
+        ).astype(np.int64)
+
+        keys = np.column_stack((candidate_lines, segment_indices))
+        unique_keys = np.unique(keys, axis=0)
+        segment_states = self._update_segment_states(unique_keys)
+        segment_scale = np.fromiter(
+            (
+                1.0
+                if segment_states[(int(line), int(segment))]
+                else self.hidden_scale
+                for line, segment in keys
+            ),
+            dtype=np.float64,
+            count=candidate_count,
+        )
+
+        delta_x = candidate_x - sensor_origin[0]
+        delta_y = candidate_y - sensor_origin[1]
+        delta_z = candidate_z - sensor_origin[2]
+        ranges = np.sqrt(delta_x * delta_x + delta_y * delta_y + delta_z * delta_z)
+
+        # The wire axis is world +X. Its apparent width approaches zero when a
+        # beam travels parallel to that axis and is largest for a side-on hit.
+        safe_ranges = np.maximum(ranges, 1.0e-9)
+        direction_x = np.clip(delta_x / safe_ranges, -1.0, 1.0)
+        side_on_factor = np.sqrt(np.maximum(0.0, 1.0 - direction_x * direction_x))
+        angle_factor = self.angle_floor + (1.0 - self.angle_floor) * side_on_factor
+        range_factor = np.exp(-ranges / self.range_decay)
+        probability = np.clip(
+            self.near_probability * range_factor * angle_factor * segment_scale,
+            0.0,
+            1.0,
+        )
+
+        retained = self.rng.random_sample(candidate_count) < probability
+        updated = valid.copy()
+        updated[rows[~retained], columns[~retained]] = False
+        return updated, candidate_count, int(np.count_nonzero(retained))
+
+
 class PointCloudToBody:
     def __init__(self) -> None:
         self.input_topic = rospy.get_param("~input_topic", "/velodyne_points")
@@ -93,6 +269,46 @@ class PointCloudToBody:
         if self.body_filter_radius < 0.0:
             raise ValueError("~body_filter_radius must be non-negative")
         self.use_tf = bool(rospy.get_param("~use_tf", False))
+        self.wire_dropout_enabled = bool(
+            rospy.get_param("~wire_dropout_enabled", False)
+        )
+        self.wire_dropout = None
+        self.last_wire_candidates = 0
+        self.last_wire_retained = 0
+        if self.wire_dropout_enabled:
+            self.wire_dropout = WireDropoutModel(
+                wire_lines=rospy.get_param(
+                    "~wire_lines",
+                    [[-18.1, 9.35], [-16.0, 9.2], [-13.9, 9.35]],
+                ),
+                x_min=float(rospy.get_param("~wire_x_min", -52.0)),
+                x_max=float(rospy.get_param("~wire_x_max", 54.0)),
+                detection_radius=float(
+                    rospy.get_param("~wire_detection_radius", 0.10)
+                ),
+                segment_length=float(rospy.get_param("~wire_segment_length", 0.5)),
+                near_detection_probability=float(
+                    rospy.get_param("~wire_near_detection_probability", 0.72)
+                ),
+                range_decay=float(rospy.get_param("~wire_range_decay", 38.0)),
+                temporal_persistence=float(
+                    rospy.get_param("~wire_temporal_persistence", 0.90)
+                ),
+                segment_on_probability=float(
+                    rospy.get_param("~wire_segment_on_probability", 0.65)
+                ),
+                hidden_probability_scale=float(
+                    rospy.get_param("~wire_hidden_probability_scale", 0.12)
+                ),
+                angle_floor=float(rospy.get_param("~wire_angle_floor", 0.15)),
+                pole_x=rospy.get_param(
+                    "~wire_pole_x", [-52.0, -34.0, -16.0, 2.0, 20.0, 38.0, 54.0]
+                ),
+                pole_exclusion_half_width=float(
+                    rospy.get_param("~wire_pole_exclusion_half_width", 0.35)
+                ),
+                seed=int(rospy.get_param("~wire_random_seed", 120)),
+            )
 
         translation = _three_values(
             rospy.get_param("~static_translation", [0.10, 0, 0.15]),
@@ -133,12 +349,13 @@ class PointCloudToBody:
         mode = "direct TF" if self.use_tf else "static SDF extrinsic + odometry"
         rospy.loginfo(
             "pointcloud_to_body: %s -> %s, target frame '%s', mode: %s, "
-            "body exclusion radius: %.2fm",
+            "body exclusion radius: %.2fm, wire dropout: %s",
             self.input_topic,
             self.output_topic,
             self.target_frame,
             mode,
             self.body_filter_radius,
+            "enabled" if self.wire_dropout_enabled else "disabled",
         )
 
     def _odom_callback(self, message: Odometry) -> None:
@@ -309,6 +526,19 @@ class PointCloudToBody:
             + translation[2]
         )
 
+        self.last_wire_candidates = 0
+        self.last_wire_retained = 0
+        if self.wire_dropout is not None:
+            valid, self.last_wire_candidates, self.last_wire_retained = (
+                self.wire_dropout.keep_mask(
+                    output_x,
+                    output_y,
+                    output_z,
+                    valid,
+                    translation,
+                )
+            )
+
         # Filtering individual points makes an organized cloud invalid. Pack
         # all retained point records into a compact, unorganized PointCloud2.
         filtered_data = bytearray()
@@ -340,10 +570,11 @@ class PointCloudToBody:
             self.publisher.publish(output)
             rospy.logdebug_throttle(
                 2.0,
-                "pointcloud_to_body: published %d / %d points after %.2fm body filter",
+                "pointcloud_to_body: published %d / %d points; wire returns %d / %d",
                 output.width,
                 message.width * message.height,
-                self.body_filter_radius,
+                self.last_wire_retained,
+                self.last_wire_candidates,
             )
         except (
             ValueError,

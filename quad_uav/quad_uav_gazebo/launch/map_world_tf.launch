@@ -1,0 +1,8 @@
+<launch>
+  <!-- Keep map coincident with world: zero translation and zero rotation. -->
+  <node pkg="tf2_ros"
+        type="static_transform_publisher"
+        name="world_to_map_tf"
+        args="0 0 0 0 0 0 world map"
+        output="screen" />
+</launch>
