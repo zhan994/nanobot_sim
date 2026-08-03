@@ -9,10 +9,11 @@ set -Eeuo pipefail
 PX4_DIR="${PX4_DIR:-$HOME/px4_dev}"
 EXTRA_WS_SETUP="${EXTRA_WS_SETUP:-}"
 
-# WORLD_FILE 可直接指定任意 world 文件；WORLD_NAME 用于选择 PX4 内置场景。
-# 两者都未设置时，默认加载本包自带的无人机训练场。
+# WORLD_FILE 可直接指定任意 world 文件；WORLD_NAME 用于选择 PX4 内置场景；
+# NANOBOT_WORLD 用于选择 gazebo_worlds 包中的场景。
 WORLD_FILE="${WORLD_FILE:-}"
 WORLD_NAME="${WORLD_NAME:-}"
+NANOBOT_WORLD="${NANOBOT_WORLD:-uav_training}"
 SDF_NAME="${SDF_NAME:-iris_lidar_light/iris_lidar_light.sdf}"
 GUI_ENABLE="${GUI_ENABLE:-false}"
 PX4_SIM_SPEED="${PX4_SIM_SPEED:-1.0}"
@@ -35,7 +36,7 @@ MAVROS_CONNECT_TIMEOUT_SEC="${MAVROS_CONNECT_TIMEOUT_SEC:-90}"
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 PACKAGE_DIR="$(cd -- "$SCRIPT_DIR/.." && pwd)"
-DEFAULT_WORLD_FILE="$PACKAGE_DIR/worlds/uav_training.world"
+DEFAULT_WORLD_FILE="${DEFAULT_WORLD_FILE:-}"
 
 PX4_BUILD_DIR="$PX4_DIR/build/px4_sitl_default"
 PX4_MAVLINK_BIN="$PX4_BUILD_DIR/bin/px4-mavlink"
@@ -117,6 +118,13 @@ GAZEBO_PKG_PATH="$(rospack find mavlink_sitl_gazebo 2>/dev/null)" || {
     echo "Error: ROS package 'mavlink_sitl_gazebo' 未找到" >&2
     exit 1
 }
+
+GAZEBO_WORLDS_PATH="$(rospack find gazebo_worlds 2>/dev/null)" || {
+    echo "Error: ROS package 'gazebo_worlds' 未找到，请先构建并 source nanobot_ws" >&2
+    exit 1
+}
+DEFAULT_WORLD_FILE="${DEFAULT_WORLD_FILE:-$GAZEBO_WORLDS_PATH/worlds/$NANOBOT_WORLD.world}"
+export GAZEBO_MODEL_PATH="$GAZEBO_WORLDS_PATH/models:$GAZEBO_MODEL_PATH"
 
 if [[ -n "$WORLD_FILE" ]]; then
     WORLD_PATH="$WORLD_FILE"

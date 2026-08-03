@@ -2,7 +2,7 @@
 <package format="2">
   <name>quad_uav_gazebo</name>
   <version>0.0.0</version>
-  <description>Gazebo models, worlds, and ROS nodes for quadrotor UAV simulation.</description>
+  <description>Gazebo vehicle models and ROS nodes for quadrotor UAV simulation.</description>
 
   <maintainer email="kc.zh@foxmail.com">nixe-kzh</maintainer>
   <license>TODO</license>
@@ -10,6 +10,7 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>gazebo_worlds</exec_depend>
   <exec_depend>mavros_msgs</exec_depend>
   <exec_depend>nav_msgs</exec_depend>
   <exec_depend>python3-numpy</exec_depend>

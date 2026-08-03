@@ -18,6 +18,5 @@ catkin_install_python(PROGRAMS
 install(DIRECTORY
   launch
   models
-  worlds
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )

@@ -87,12 +87,16 @@ cd ~/nanobot_ws/src
 git clone -b feature_uav https://github.com/zhan994/nanobot_sim.git
 ```
 
-2. 移动模型
+2. 场景与模型路径
 
 ```
-cp -r ~/nanobot_ws/src/nanobot_sim/quad_uav/quad_uav_gazebo/models/* ~/px4_dev/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models
-cp -r ~/nanobot_ws/src/nanobot_sim/quad_uav/quad_uav_gazebo/worlds/* ~/px4_dev/Tools/simulation/gazebo-classic/sitl_gazebo-classic/worlds
+cd ~/nanobot_ws
+catkin_make
+source devel/setup.bash
 ```
+
+启动脚本会通过 `rospack` 直接读取 `gazebo_worlds` 中的场景与场景模型，
+无需复制到 PX4 源码目录。无人机机体模型仍由 `quad_uav_gazebo` 提供。
 
 3. 安装依赖
 

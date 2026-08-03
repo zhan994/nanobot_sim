@@ -3,9 +3,8 @@
 set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-PACKAGE_DIR="$(cd -- "$SCRIPT_DIR/.." && pwd)"
 
-export DEFAULT_WORLD_FILE="$PACKAGE_DIR/worlds/mountain_tea_garden_80m.world"
+export NANOBOT_WORLD="mountain_tea_garden_80m"
 export SPAWN_X="${SPAWN_X:--34.0}"
 export SPAWN_Y="${SPAWN_Y:--33.0}"
 export SPAWN_Z="${SPAWN_Z:-4.8}"
