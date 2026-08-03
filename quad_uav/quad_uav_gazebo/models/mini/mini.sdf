@@ -1,0 +1,78 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="mini">
+    <include>
+      <uri>model://iris</uri>
+    </include>
+
+    <!-- Independent low-load lidar profile: 4,320 rays per scan at 5 Hz. -->
+    <link name="lidar_link">
+      <pose>0.10 0 0.15 0 0.785398 0</pose>
+
+      <inertial>
+        <mass>0.001</mass>
+        <inertia>
+          <ixx>1.1e-6</ixx>
+          <iyy>1.1e-6</iyy>
+          <izz>1.35e-6</izz>
+        </inertia>
+      </inertial>
+
+      <visual name="lidar_visual">
+        <geometry>
+          <cylinder>
+            <radius>0.052</radius>
+            <length>0.071</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.08 0.22 0.10 1</ambient>
+          <diffuse>0.15 0.50 0.22 1</diffuse>
+        </material>
+      </visual>
+
+      <sensor name="mini_lidar" type="ray">
+        <always_on>1</always_on>
+        <update_rate>5</update_rate>
+        <visualize>false</visualize>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>90</samples>
+              <resolution>1</resolution>
+              <min_angle>-3.141593</min_angle>
+              <max_angle>3.141593</max_angle>
+            </horizontal>
+            <vertical>
+              <samples>48</samples>
+              <resolution>1</resolution>
+              <min_angle>0</min_angle>
+              <max_angle>1.570796</max_angle>
+            </vertical>
+          </scan>
+          <range>
+            <min>0.1</min>
+            <max>30.0</max>
+            <resolution>0.002</resolution>
+          </range>
+        </ray>
+
+        <plugin name="velodyne_ros_laser" filename="libgazebo_ros_velodyne_laser.so">
+          <robotNamespace>/</robotNamespace>
+          <topicName>/velodyne_points</topicName>
+          <frameName>velodyne</frameName>
+          <organize_cloud>false</organize_cloud>
+          <min_range>0.1</min_range>
+          <max_range>30.0</max_range>
+          <min_intensity>0.0</min_intensity>
+          <gaussianNoise>0.012</gaussianNoise>
+        </plugin>
+      </sensor>
+    </link>
+
+    <joint name="lidar_joint" type="fixed">
+      <child>lidar_link</child>
+      <parent>iris::base_link</parent>
+    </joint>
+  </model>
+</sdf>

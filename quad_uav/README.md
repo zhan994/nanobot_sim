@@ -175,16 +175,15 @@ GUI_ENABLE=false \
 ./scripts/rspx4.sh
 ```
 
-复杂 CPU-ray 场景可选择独立的 mini 雷达：
+复杂 CPU-ray 场景可选择 `b19fc3e` 引入的独立 mini 雷达：
 
 ```bash
-SDF_NAME=iris_lidar_mini/iris_lidar_mini.sdf \
-GUI_ENABLE=false \
-./scripts/rspx4.sh
+SDF_NAME=mini/mini.sdf GUI_ENABLE=false ./scripts/rspx4.sh
 ```
 
-mini 配置为 `90 × 48 @ 5 Hz`、量程 `30 m`，输出话题仍为
-`/velodyne_points`。
+`iris_lidar_mini/iris_lidar_mini.sdf` 是后续 complex 开发中保留的兼容入口。
+两者均配置为 `90 × 48 @ 5 Hz`、量程 `30 m`，输出话题为
+`/velodyne_points`，不会修改已有雷达参数。
 
 > 第一次使用 请 chmod +x 给权限
 `chmod +x ./scripts/rspx4.sh`
