@@ -54,3 +54,6 @@ CATKIN_IGNORE
 .catkin_workspace
 
 Diff-Planner
+!/.gitignore
+!/diff_tracked/
+!/diff_tracked/**
