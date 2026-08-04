@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version='1.6'>
-  <model name='iris_lidar'>
+  <model name='airylike_lidar'>
 
     <include>
       <uri>model://iris</uri>
@@ -80,7 +80,7 @@
           <organize_cloud>false</organize_cloud>
           <min_range>0.1</min_range>
           <max_range>60.0</max_range>
-          <min_intensity>10.0</min_intensity>
+          <min_intensity>0.0</min_intensity>
           <!-- Airy revisions specify roughly 1.0-1.5 cm (1 sigma). -->
           <gaussianNoise>0.012</gaussianNoise>
         </plugin>

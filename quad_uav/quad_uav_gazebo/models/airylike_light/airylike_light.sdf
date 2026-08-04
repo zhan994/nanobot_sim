@@ -1,19 +1,25 @@
 <?xml version="1.0" ?>
 <sdf version="1.6">
-  <model name="iris_lidar_mini">
+  <model name="airylike_light">
 
     <include>
       <uri>model://iris</uri>
     </include>
 
     <!--
-      Mini hemispherical profile for complex CPU-ray scenes.
+      Lightweight Airy-96-like profile for real-time Gazebo simulation.
 
-      - 90 horizontal samples over 360 degrees
-      - 48 vertical samples over 90 degrees
-      - 5 Hz scan rate
-      - 30 m range
-      - 4,320 rays per scan
+      Preserved:
+        - 96 vertical beams
+        - 360 x 90 degree field of view
+        - 10 Hz scan rate
+        - /velodyne_points ROS topic and velodyne frame
+
+      Reduced:
+        - 180 horizontal samples (2 degree spacing), instead of 900
+        - 30 m simulated range, instead of 60 m
+
+      Total rays per scan: 180 x 96 = 17,280 (20% of the full profile).
     -->
     <link name="lidar_link">
       <pose>0.10 0 0.15 0 0.785398 0</pose>
@@ -40,20 +46,22 @@
         </material>
       </visual>
 
-      <sensor name="mini_lidar" type="ray">
+      <sensor name="airy96_like_light" type="ray">
         <always_on>1</always_on>
-        <update_rate>5</update_rate>
+        <update_rate>10</update_rate>
         <visualize>false</visualize>
         <ray>
           <scan>
             <horizontal>
-              <samples>90</samples>
+              <!-- 360 degrees / 180 samples = 2 degrees per column. -->
+              <samples>180</samples>
               <resolution>1</resolution>
               <min_angle>-3.141593</min_angle>
               <max_angle>3.141593</max_angle>
             </horizontal>
             <vertical>
-              <samples>48</samples>
+              <!-- Preserve the Airy-like 96-beam hemispherical pattern. -->
+              <samples>96</samples>
               <resolution>1</resolution>
               <min_angle>0</min_angle>
               <max_angle>1.570796</max_angle>
