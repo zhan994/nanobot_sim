@@ -87,16 +87,12 @@ cd ~/nanobot_ws/src
 git clone -b feature_uav https://github.com/zhan994/nanobot_sim.git
 ```
 
-2. 场景与模型路径
+2. 复制无人机模型
 
 ```
-cd ~/nanobot_ws
-catkin_make
-source devel/setup.bash
+cp -r ~/nanobot_ws/src/nanobot_sim/quad_uav/quad_uav_gazebo/models/* ~/px4_dev/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models
 ```
-
-启动脚本会通过 `rospack` 直接读取 `gazebo_worlds` 中的场景与场景模型，
-无需复制到 PX4 源码目录。无人机机体模型仍由 `quad_uav_gazebo` 提供。
+> world 文件无需复制，`rspx4.sh` 会直接从 `nanobot_sim/gazebo_worlds/worlds` 读取；
 
 3. 安装依赖
 
@@ -170,21 +166,18 @@ roscd quad_uav_gazebo/
 > 也可自定义参数，例如：
 > 使用120m场景或Airylike雷达时计算量较大，可以开启无GUI模式 `GUI_ENABLE=false`
 ```
-SDF_NAME=iris_lidar_light/iris_lidar_light.sdf \
+SDF_NAME=airylike_light/airylike_light.sdf \
 GUI_ENABLE=false \
 ./scripts/rspx4.sh
 ```
 
-复杂 CPU-ray 场景可选择 `b19fc3e` 引入的独立 mini 雷达：
+根据场景可选择 airylike_mini / airylike_lidar (模拟Robosense Airy雷达参数) 雷达：
 
 ```bash
-SDF_NAME=mini/mini.sdf GUI_ENABLE=false ./scripts/rspx4.sh
+SDF_NAME=airylike_mini/airylike_mini.sdf GUI_ENABLE=false ./scripts/rspx4.sh
 ```
 
-`iris_lidar_mini/iris_lidar_mini.sdf` 是后续 complex 开发中保留的兼容入口。
-两者均配置为 `90 × 48 @ 5 Hz`、量程 `30 m`，输出话题为
-`/velodyne_points`，不会修改已有雷达参数。
-
+> 计算量：airylike_lidar > airylike_light > airylike_mini
 > 第一次使用 请 chmod +x 给权限
 `chmod +x ./scripts/rspx4.sh`
 
@@ -202,7 +195,7 @@ cd ~/nanobot_ws && source devel/setup.bash
 rosrun quad_uav_gazebo uav_cli.py
 ```
 > 输入 '?' 查看 help
-> 也可使用原版：rc_sim.py
+> 也可使用：rc_sim.py
 
 - Terminal 4: 启动点云转换
 
