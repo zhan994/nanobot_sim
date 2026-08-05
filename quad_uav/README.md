@@ -3,7 +3,7 @@
 [English](README.md) | [简体中文](README_CN.md)
 
 - **quad_uav_gazebo**: PX4-SITL Gazebo simulation.
-- **quad_uav_planner**: simple usages for Diff-Planner.
+- **quad_uav_planner**: usage examples for Diff-Planner.
 
 ## PX4-SITL
 
@@ -22,8 +22,8 @@ sudo apt install -y git cmake build-essential libssl-dev libusb-1.0-0-dev \
 
 pip3 install kconfiglib jsonschema jinja2 future lxml pyros-genmsg empy==3.3.4 pyyaml
 
-# mavros
-sudo apt install -y  ros-noetic-mavros ros-noetic-mavros-extras
+# MAVROS
+sudo apt install -y ros-noetic-mavros ros-noetic-mavros-extras
 cd /opt/ros/noetic/lib/mavros
 sudo chmod +x install_geographiclib_datasets.sh
 sudo ./install_geographiclib_datasets.sh
@@ -35,16 +35,16 @@ git clone -b dev_nanobot https://github.com/zhan994/PX4-Autopilot.git --recursiv
 cd px4_dev
 sudo chmod +x ./Tools/setup/ubuntu.sh
 
-# 修改一下内容
-## ./Tools/setup/requirements.txt 的 `matplotlib>=3.0.*` 改为
+# In ./Tools/setup/requirements.txt, replace `matplotlib>=3.0.*` with:
 matplotlib>=3.0
-## ./Tools/setup/ubuntu.sh 的176行左右换源
+
+# Optional: replace the download source near line 176 of ./Tools/setup/ubuntu.sh
 wget -O /tmp/gcc-arm-none-eabi-${NUTTX_GCC_VERSION}-linux.tar.bz2 https://mirrors.tuna.tsinghua.edu.cn/armbian-releases/_toolchains/gcc-arm-none-eabi-${NUTTX_GCC_VERSION}-${INSTALL_ARCH}-linux.tar.bz2 && \
 sudo tar -jxf /tmp/gcc-arm-none-eabi-${NUTTX_GCC_VERSION}-linux.tar.bz2 -C /opt/;
 
 bash ./Tools/setup/ubuntu.sh
 
-# `sudo reboot`，验证是否开启gazebo页面
+# Reboot with `sudo reboot` if required, then verify that Gazebo starts
 cd ~/px4_dev
 make px4_sitl gazebo
 ```
@@ -52,23 +52,23 @@ make px4_sitl gazebo
 ### Run
 
 ```bash
-# uav models
+# Copy the UAV models
 cp -r <path-to-nanobot-ws>/src/nanobot_sim/quad_uav/quad_uav_gazebo/models/* ~/px4_dev/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models
 
 cd <path-to-nanobot-ws>/src/nanobot_sim/quad_uav
 chmod +x ./quad_uav_gazebo/scripts/*.sh
 chmod +x ./quad_uav_gazebo/scripts/*.py
 
-# 启动 px4-sitl
+# Start PX4-SITL
 cd <path-to-nanobot-ws>
 source devel/setup.bash
 cd <path-to-nanobot-ws>/src/nanobot_sim/quad_uav
 ./quad_uav_gazebo/scripts/rspx4.sh
 
-# 使用脚本将雷达系点云旋转至Body系
+# Transform the LiDAR point cloud into the world frame
 python3 ./quad_uav_gazebo/scripts/pointcloud_to_body.py
 
-# 结束后清理环境
+# Clean up the simulation environment after use
 ./quad_uav_gazebo/scripts/clean_env.sh
 ```
 
@@ -95,6 +95,7 @@ roscd quad_uav_gazebo/
 chmod +x ./scripts/rspx4.sh
 ./scripts/rspx4.sh
 ```
+
 > Three Airy-like LiDAR models are available: `airylike_lidar`, `airylike_light`, and `airylike_mini`. The `airylike_lidar` model simulates the RoboSense Airy parameters.
 >
 > Computational cost, from highest to lowest: `airylike_lidar` > `airylike_light` > `airylike_mini`.
@@ -107,6 +108,14 @@ For example:
 SDF_NAME=airylike_mini/airylike_mini.sdf GUI_ENABLE=false ./scripts/rspx4.sh
 ```
 
+To launch the Mountain Tea Garden world with its preset spawn position:
+
+```bash
+./scripts/rspx4_tea_garden_80m.sh
+```
+
+> The wrapper defaults to `mountain_tea_garden_80m.world` with spawn position `(-34.0, -33.0, 4.8)`. Override `WORLD_NAME`, `SPAWN_X`, `SPAWN_Y`, or `SPAWN_Z` as needed.
+
 - Terminal 2: px4ctrl
 
 ```bash
@@ -114,15 +123,16 @@ cd <path-to-nanobot-ws> && source devel/setup.bash
 roslaunch px4ctrl run_ctrl_sim.launch
 ```
 
-- Terminal 3: RC simulate and Goal publish Tool
+- Terminal 3: RC simulation and goal publisher
 
 ```bash
-cd ~/nanobot_ws && source devel/setup.bash
+cd <path-to-nanobot-ws> && source devel/setup.bash
 rosrun quad_uav_gazebo uav_cli.py
 ```
-> Enter `?` to display the available commands. For basic RC simulation without goal publishing (for Diff-planner), use `rc_sim.py` instead.
 
-- Terminal 4: 点云转换
+> Enter `?` to display the available commands. For basic RC simulation without goal publishing for Diff-Planner, use `rc_sim.py` instead.
+
+- Terminal 4: point-cloud transform
 
 ```bash
 cd <path-to-nanobot-ws> && source devel/setup.bash
@@ -141,6 +151,7 @@ roslaunch diff_planner gz_single_drone.launch enable_rviz:=true
 - Terminal 6: world-to-map transform
 
 > Diff-Planner uses `world` as its global reference frame, while other components use `map`. Launch the identity transform below to connect the two frames (`world` → `map`).
+
 ```bash
-cd ~/nanobot_ws && source devel/setup.bash && roslaunch quad_uav_gazebo map_world_tf.launch
+cd <path-to-nanobot-ws> && source devel/setup.bash && roslaunch quad_uav_gazebo map_world_tf.launch
 ```

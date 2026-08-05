@@ -65,7 +65,7 @@ source devel/setup.bash
 cd <path-to-nanobot-ws>/src/nanobot_sim/quad_uav
 ./quad_uav_gazebo/scripts/rspx4.sh
 
-# 将点云从雷达坐标系旋转到机体坐标系
+# 将点云从雷达坐标系转换到 world 坐标系
 python3 ./quad_uav_gazebo/scripts/pointcloud_to_body.py
 
 # 结束后清理环境
@@ -108,6 +108,14 @@ chmod +x ./scripts/rspx4.sh
 SDF_NAME=airylike_mini/airylike_mini.sdf GUI_ENABLE=false ./scripts/rspx4.sh
 ```
 
+如需使用预设出生点启动山地茶园场景，运行：
+
+```bash
+./scripts/rspx4_tea_garden_80m.sh
+```
+
+> 该包装脚本默认使用 `mountain_tea_garden_80m.world`，出生点为 `(-34.0, -33.0, 4.8)`。可根据需要通过 `WORLD_NAME`、`SPAWN_X`、`SPAWN_Y` 或 `SPAWN_Z` 覆盖默认值。
+
 - 终端 2：px4ctrl
 
 ```bash
@@ -118,7 +126,7 @@ roslaunch px4ctrl run_ctrl_sim.launch
 - 终端 3：RC 仿真与目标发布工具
 
 ```bash
-cd ~/nanobot_ws && source devel/setup.bash
+cd <path-to-nanobot-ws> && source devel/setup.bash
 rosrun quad_uav_gazebo uav_cli.py
 ```
 
@@ -145,5 +153,5 @@ roslaunch diff_planner gz_single_drone.launch enable_rviz:=true
 > Diff-Planner 使用 `world` 作为全局参考坐标系，而其他组件使用 `map`。启动下面的恒等变换，连接这两个坐标系（`world` → `map`）。
 
 ```bash
-cd ~/nanobot_ws && source devel/setup.bash && roslaunch quad_uav_gazebo map_world_tf.launch
+cd <path-to-nanobot-ws> && source devel/setup.bash && roslaunch quad_uav_gazebo map_world_tf.launch
 ```
