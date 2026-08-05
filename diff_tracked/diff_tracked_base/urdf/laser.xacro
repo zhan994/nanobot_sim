@@ -6,7 +6,7 @@
   <xacro:property name="laser_radius" value="0.05" />
   <xacro:property name="laser_x" value="0.0"/>
   <xacro:property name="laser_y" value="0.0"/>
-  <xacro:property name="laser_z" value="${laser_length / 2}"/>
+  <xacro:property name="laser_z" value="${laser_length / 2 + 0.04}"/>
 
   <link name="laser">
     <inertial>

@@ -1,0 +1,26 @@
+<launch>
+  <arg name="odom_input" default="/encoder_odom"/>
+  <arg name="imu_input" default="/imu"/>
+  <arg name="odom_output" default="/odom"/>
+
+  <arg name="base_frame" default="base_link"/>
+  <arg name="publish_tf" default="true"/>
+
+  <node pkg="robot_localization"
+        type="ekf_localization_node"
+        name="ekf_odom"
+        clear_params="true"
+        output="screen">
+
+    <rosparam command="load"
+              file="$(find diff_tracked_localization)/config/ekf_odom.yaml"/>
+
+    <!-- 覆盖 YAML 中与运行环境相关的配置 -->
+    <param name="odom0" value="$(arg odom_input)"/>
+    <param name="imu0" value="$(arg imu_input)"/>
+    <param name="base_link_frame" value="$(arg base_frame)"/>
+    <param name="publish_tf" value="$(arg publish_tf)"/>
+
+    <remap from="odometry/filtered" to="$(arg odom_output)"/>
+  </node>
+</launch>

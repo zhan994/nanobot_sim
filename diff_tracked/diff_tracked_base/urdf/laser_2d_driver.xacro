@@ -1,0 +1,44 @@
+<?xml version = "1.0"?>
+<robot name="tracked_lidar_2d_drive" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:property name="PI" value="3.1415926"/>
+    <gazebo reference="laser">
+        <sensor name="tracked_lidar_2d_sensor" type="ray">
+            <pose>0 0 0 0 0 0</pose>
+            <always_on>true</always_on>
+            <visualize>true</visualize>
+            <update_rate>10</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>1800</samples>
+                        <resolution>1</resolution>
+                        <min_angle>-${PI}</min_angle>
+                        <max_angle>${PI - 2.0 * PI / 1800.0}</max_angle>
+                    </horizontal>
+
+                </scan>
+
+                <range>
+                    <min>0.6</min>
+                    <max>20.0</max>
+                    <resolution>0.01</resolution>
+                </range>
+
+                <noise>
+                <type>gaussian</type>
+                <mean>0.0</mean>
+                <stddev>0.008</stddev>
+                </noise>
+            </ray>
+
+            <plugin name="gazebo_ros_laser_2d_controller"
+                filename="libgazebo_ros_laser.so">
+                <topicName>/scan_2d</topicName>
+                <frameName>laser</frameName>
+                <gaussianNoise>0.008</gaussianNoise>
+                <alwaysOn>true</alwaysOn>
+                <updateRate>10</updateRate>
+            </plugin>
+        </sensor>
+    </gazebo>
+</robot>

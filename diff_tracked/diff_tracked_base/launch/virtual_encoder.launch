@@ -1,0 +1,32 @@
+<launch>
+  <arg name="input_odom_topic" default="/gz_odom"/>
+  <arg name="output_odom_topic" default="/encoder_odom"/>
+  <arg name="joint_states_topic" default="/virtual_encoder/joint_states"/>
+  <arg name="wheel_separation" default="0.699"/>
+  <arg name="wheel_radius" default="0.051"/>
+  <!-- Ignore millimetre-level lateral numerical noise from Gazebo. -->
+  <arg name="lateral_velocity_tolerance" default="0.02"/>
+
+  <node pkg="diff_tracked_base"
+        type="virtual_encoder_odometry_node"
+        name="virtual_encoder_odometry"
+        output="screen">
+    <param name="input_odom_topic" value="$(arg input_odom_topic)"/>
+    <param name="output_odom_topic" value="$(arg output_odom_topic)"/>
+    <param name="joint_states_topic" value="$(arg joint_states_topic)"/>
+    <param name="odom_frame" value="odom"/>
+    <param name="base_frame" value="base_link"/>
+    <param name="wheel_separation" value="$(arg wheel_separation)"/>
+    <param name="wheel_radius" value="$(arg wheel_radius)"/>
+    <param name="lateral_velocity_tolerance"
+           value="$(arg lateral_velocity_tolerance)"/>
+    <param name="max_dt" value="0.2"/>
+
+    <!-- Ideal continuous encoder: low, non-zero covariance for EKF. -->
+    <param name="pose_covariance_xy" value="0.001"/>
+    <param name="pose_covariance_yaw" value="0.001"/>
+    <param name="twist_covariance_x" value="0.001"/>
+    <param name="twist_covariance_y" value="0.001"/>
+    <param name="twist_covariance_yaw" value="0.001"/>
+  </node>
+</launch>
