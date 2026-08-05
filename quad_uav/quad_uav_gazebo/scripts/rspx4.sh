@@ -9,7 +9,7 @@ set -Eeuo pipefail
 PX4_DIR="${PX4_DIR:-$HOME/px4_dev}"
 EXTRA_WS_SETUP="${EXTRA_WS_SETUP:-}"
 
-WORLD_NAME="${WORLD_NAME:-uav_training.world}"
+WORLD_NAME="${WORLD_NAME:-staggered_blocks_50m.world}"
 SDF_NAME="${SDF_NAME:-iris_lidar/iris_lidar.sdf}"
 GUI_ENABLE="${GUI_ENABLE:-true}"
 PX4_SIM_SPEED="${PX4_SIM_SPEED:-1.0}"
