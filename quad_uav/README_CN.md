@@ -96,26 +96,6 @@ chmod +x ./scripts/rspx4.sh
 ./scripts/rspx4.sh
 ```
 
-> 提供三种 Airy 类型的 LiDAR 模型：`airylike_lidar`、`airylike_light` 和 `airylike_mini`。`airylike_lidar` 模拟 RoboSense Airy 参数。
->
-> 计算量从高到低：`airylike_lidar` > `airylike_light` > `airylike_mini`。
->
-> 默认模型：`airylike_light/airylike_light.sdf`。
-
-例如：
-
-```bash
-SDF_NAME=airylike_mini/airylike_mini.sdf GUI_ENABLE=false ./scripts/rspx4.sh
-```
-
-如需使用预设出生点启动山地茶园场景，运行：
-
-```bash
-./scripts/rspx4_tea_garden_80m.sh
-```
-
-> 该包装脚本默认使用 `mountain_tea_garden_80m.world`，出生点为 `(-34.0, -33.0, 4.8)`。可根据需要通过 `WORLD_NAME`、`SPAWN_X`、`SPAWN_Y` 或 `SPAWN_Z` 覆盖默认值。
-
 - 终端 2：px4ctrl
 
 ```bash

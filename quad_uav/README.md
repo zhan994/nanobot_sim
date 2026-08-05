@@ -96,26 +96,6 @@ chmod +x ./scripts/rspx4.sh
 ./scripts/rspx4.sh
 ```
 
-> Three Airy-like LiDAR models are available: `airylike_lidar`, `airylike_light`, and `airylike_mini`. The `airylike_lidar` model simulates the RoboSense Airy parameters.
->
-> Computational cost, from highest to lowest: `airylike_lidar` > `airylike_light` > `airylike_mini`.
->
-> Default model: `airylike_light/airylike_light.sdf`.
-
-For example:
-
-```bash
-SDF_NAME=airylike_mini/airylike_mini.sdf GUI_ENABLE=false ./scripts/rspx4.sh
-```
-
-To launch the Mountain Tea Garden world with its preset spawn position:
-
-```bash
-./scripts/rspx4_tea_garden_80m.sh
-```
-
-> The wrapper defaults to `mountain_tea_garden_80m.world` with spawn position `(-34.0, -33.0, 4.8)`. Override `WORLD_NAME`, `SPAWN_X`, `SPAWN_Y`, or `SPAWN_Z` as needed.
-
 - Terminal 2: px4ctrl
 
 ```bash

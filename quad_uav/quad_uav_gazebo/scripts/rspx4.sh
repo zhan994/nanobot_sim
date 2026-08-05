@@ -10,7 +10,7 @@ PX4_DIR="${PX4_DIR:-$HOME/px4_dev}"
 EXTRA_WS_SETUP="${EXTRA_WS_SETUP:-}"
 
 WORLD_NAME="${WORLD_NAME:-uav_training.world}"
-SDF_NAME="${SDF_NAME:-airylike_light/airylike_light.sdf}"
+SDF_NAME="${SDF_NAME:-iris_lidar/iris_lidar.sdf}"
 GUI_ENABLE="${GUI_ENABLE:-true}"
 PX4_SIM_SPEED="${PX4_SIM_SPEED:-1.0}"
 LAUNCH_FILE="${LAUNCH_FILE:-mavros_posix_sitl.launch}"
@@ -24,8 +24,7 @@ STREAM_TARGET_RATE_HZ="${STREAM_TARGET_RATE_HZ:-200}"
 PX4_MAVLINK_UDP_PORT="${PX4_MAVLINK_UDP_PORT:-14580}"
 
 # 等待 MAVROS 与 PX4 建立连接的最长时间
-# 高分辨率雷达机模首次生成可能需要约 45 秒，预留足够启动余量
-MAVROS_CONNECT_TIMEOUT_SEC="${MAVROS_CONNECT_TIMEOUT_SEC:-90}"
+MAVROS_CONNECT_TIMEOUT_SEC="${MAVROS_CONNECT_TIMEOUT_SEC:-60}"
 
 # -----------------------------------------------------------------------------
 # 2. 计算 PX4 内部路径，并注册退出清理逻辑
