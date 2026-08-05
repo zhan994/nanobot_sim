@@ -107,10 +107,8 @@ roslaunch px4ctrl run_ctrl_sim.launch
 
 ```bash
 cd <path-to-nanobot-ws> && source devel/setup.bash
-rosrun quad_uav_gazebo uav_cli.py
+rosrun quad_uav_gazebo rc_sim.py
 ```
-
-> 输入 `?` 查看可用命令。如果只需要基本 RC 仿真，不需要为 Diff-Planner 发布目标，可改用 `rc_sim.py`。
 
 - 终端 4：点云转换
 
