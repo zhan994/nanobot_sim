@@ -128,4 +128,4 @@ cd <path-to-nanobot-ws> && source devel/setup.bash
 roslaunch diff_planner gz_single_drone.launch enable_rviz:=true
 ```
 
-> After takeoff, wait for the UAV to hover, then set a target in RViz with **2D Nav Goal**. Alternatively, enter `gl <x> <y> <z>` in `uav_cli.py` to publish a 3D goal. Add objects in Gazebo to create obstacle-avoidance scenarios.
+> After takeoff, wait for the UAV to hover, then set a target in RViz with **2D Nav Goal**. Alternatively, enter `gl <x> <y> <z>` in `rc_sim.py` to publish a 3D goal. Add objects in Gazebo to create obstacle-avoidance scenarios.

@@ -126,4 +126,4 @@ cd <path-to-nanobot-ws> && source devel/setup.bash
 roslaunch diff_planner gz_single_drone.launch enable_rviz:=true
 ```
 
-> 无人机起飞后，等待其进入悬停状态，然后在 RViz 中使用 **2D Nav Goal** 设置目标。也可在 `uav_cli.py` 中输入 `gl <x> <y> <z>` 发布三维目标。可在 Gazebo 中添加物体，构建避障测试场景。
+> 无人机起飞后，等待其进入悬停状态，然后在 RViz 中使用 **2D Nav Goal** 设置目标。也可在 `rc_sim.py` 中输入 `gl <x> <y> <z>` 发布三维目标。可在 Gazebo 中添加物体，构建避障测试场景。
