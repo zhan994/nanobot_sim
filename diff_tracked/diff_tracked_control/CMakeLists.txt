@@ -37,4 +37,3 @@ target_link_libraries(line_rpp_controller_node
 install(TARGETS line_rpp_controller_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
-

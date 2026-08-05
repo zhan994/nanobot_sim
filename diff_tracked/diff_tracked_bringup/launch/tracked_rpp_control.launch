@@ -1,16 +1,59 @@
 <launch>
   <arg name="start_gazebo" default="true"/>
+  <!-- Keep the robot stationary until Gazebo, EKF and slam_toolbox are ready. -->
   <arg name="start_control" default="true"/>
+  <arg name="start_localization" default="true"/>
+  <!-- start_slam: online mapping; start_slam_localization: saved-map localization. -->
+  <arg name="start_slam" default="false"/>
+  <arg name="start_slam_localization" default="true"/>
+
+  <!-- Base filename only; slam_toolbox appends .posegraph and .data. -->
+  <arg name="posegraph_file"
+       default="/home/democles/diff_drive/posegraphs/encoder_only"/>
+  <!-- Initial robot pose in the saved map; yaw is in radians. -->
+  <arg name="localization_initial_x" default="0.0"/>
+  <arg name="localization_initial_y" default="0.0"/>
+  <arg name="localization_initial_yaw" default="0.0"/>
 
   <arg name="distance" default="50.0"/>
-  <arg name="speed" default="0.8"/>
-  <arg name="odom_topic" default="/gz_odom"/>
+  <arg name="speed" default="2.0"/>
+  <arg name="initial_heading_deg" default="0.0"/>
+  <arg name="control_startup_delay" default="5.0"/>
+  <!-- The controller and slam_toolbox use the EKF result, not Gazebo ground truth. -->
+  <arg name="odom_topic" default="/odom"/>
 
   <include if="$(arg start_gazebo)" file="$(find diff_tracked_gazebo)/launch/bunker_gazebo.launch" />
+
+  <include if="$(arg start_localization)"
+           file="$(find diff_tracked_localization)/launch/ekf_odom.launch">
+    <arg name="odom_input" value="/encoder_odom"/>
+    <arg name="imu_input" value="/imu"/>
+    <arg name="odom_output" value="/odom"/>
+    <arg name="base_frame" value="base_link"/>
+
+    <!-- EKF owns odom -> base_link. Gazebo's ground-truth TF is isolated. -->
+    <arg name="publish_tf" value="true"/>
+  </include>
+
+  <!-- slam_toolbox owns map -> odom. Localization takes priority if both
+       slam switches are true, preventing duplicate map -> odom publishers. -->
+  <include if="$(eval arg('start_slam') == 'true' and arg('start_slam_localization') != 'true')"
+           file="$(find slam_toolbox)/launch/online_async.launch" />
+
+  <include if="$(arg start_slam_localization)"
+           file="$(find diff_tracked_bringup)/launch/slam_toolbox_localization.launch">
+    <arg name="posegraph_file" value="$(arg posegraph_file)"/>
+    <arg name="initial_pose_x" value="$(arg localization_initial_x)"/>
+    <arg name="initial_pose_y" value="$(arg localization_initial_y)"/>
+    <arg name="initial_pose_yaw" value="$(arg localization_initial_yaw)"/>
+  </include>
 
   <include if="$(arg start_control)" file="$(find diff_tracked_control)/launch/line_rpp_control.launch">
     <arg name="distance" value="$(arg distance)"/>
     <arg name="speed" value="$(arg speed)"/>
     <arg name="odom_topic" value="$(arg odom_topic)"/>
+    <arg name="initial_heading_deg" value="$(arg initial_heading_deg)"/>
+    <arg name="startup_delay" value="$(arg control_startup_delay)"/>
   </include>
+
 </launch>

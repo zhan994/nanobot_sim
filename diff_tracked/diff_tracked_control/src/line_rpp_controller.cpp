@@ -23,6 +23,7 @@ public:
     if (!ValidateParameters()) {
       return false;
     }
+
     //公共订阅，绝对话题
     cmd_vel_publisher_ = nh_.advertise<geometry_msgs::Twist>(cmd_vel_topic_, 1);
 
@@ -51,13 +52,14 @@ private:
                       std::string("/planned_path"));
     private_nh_.param("actual_path_topic", actual_path_topic_,
                       std::string("/actual_path"));
-
     private_nh_.param("target_distance", target_distance_, 5.0);
     private_nh_.param("cruise_speed", desired_speed_, 0.5);
+    private_nh_.param("initial_heading_deg", initial_heading_deg_, -90.0);
     private_nh_.param("min_linear_speed", min_linear_speed_, 0.05);
     private_nh_.param("max_angular_speed", max_angular_speed_, 1.0);
     private_nh_.param("distance_tolerance", distance_tolerance_, 0.03);
     private_nh_.param("control_rate", control_rate_, 20.0);
+    private_nh_.param("startup_delay", startup_delay_, 2.0);
 
     private_nh_.param("lookahead_distance", lookahead_distance_, 0.5);
     private_nh_.param("min_lookahead_distance", min_lookahead_distance_, 0.25);
@@ -90,6 +92,11 @@ private:
       return false;
     }
 
+    if (!std::isfinite(initial_heading_deg_)) {
+      ROS_ERROR("~initial_heading_deg must be finite");
+      return false;
+    }
+
     if (!CheckPositive("max_angular_speed", max_angular_speed_)) {
       return false;
     }
@@ -99,6 +106,11 @@ private:
     }
 
     if (!CheckPositive("control_rate", control_rate_)) {
+      return false;
+    }
+
+    if (startup_delay_ < 0.0) {
+      ROS_ERROR("~startup_delay must be non-negative");
       return false;
     }
 
@@ -213,12 +225,15 @@ private:
     if (!has_start_pose_) {
       start_x_ = message->pose.pose.position.x;
       start_y_ = message->pose.pose.position.y;
-      start_yaw_ = YawFromQuaternion(message->pose.pose.orientation);
+      start_yaw_ = initial_heading_deg_ * std::acos(-1.0) / 180.0;
+      startup_wall_time_ = ros::WallTime::now();
+      startup_delay_started_ = true;
 
       has_start_pose_ = true;
 
-      ROS_INFO("RPP start at (%.3f, %.3f), yaw %.3f rad", start_x_, start_y_,
-               start_yaw_);
+      ROS_INFO("RPP start at (%.3f, %.3f), planned heading %.1f deg "
+               "(%.3f rad)",
+               start_x_, start_y_, initial_heading_deg_, start_yaw_);
 
       PublishPlannedPath(*message);
     }
@@ -307,6 +322,18 @@ private:
       ROS_WARN_THROTTLE(2.0, "waiting for odometry on %s", odom_topic_.c_str());
       return;
     }
+
+    if (startup_delay_started_) {
+      const double startup_elapsed =
+          (ros::WallTime::now() - startup_wall_time_).toSec();
+      if (startup_elapsed < startup_delay_) {
+        ROS_INFO_THROTTLE(1.0, "Controller startup delay: %.1f s remaining",
+                          startup_delay_ - startup_elapsed);
+        PublishStop();
+        return;
+      }
+    }
+
     //最近里程计消息的时间
     const ros::Time odom_stamp = latest_odom_.header.stamp;
 
@@ -496,6 +523,7 @@ private:
   double max_angular_speed_ = 1.0;
   double distance_tolerance_ = 0.03;
   double control_rate_ = 20.0;
+  double startup_delay_ = 2.0;
 
   double lookahead_distance_ = 0.5;
   double min_lookahead_distance_ = 0.25;
@@ -518,11 +546,15 @@ private:
 
   bool has_start_pose_ = false;
   bool has_latest_odom_ = false;
+  bool startup_delay_started_ = false;
   bool finished_ = false;
+
+  ros::WallTime startup_wall_time_;
 
   double start_x_ = 0.0;
   double start_y_ = 0.0;
   double start_yaw_ = 0.0;
+  double initial_heading_deg_ = 0.0;
 
   nav_msgs::Odometry latest_odom_;
   nav_msgs::Path actual_path_;

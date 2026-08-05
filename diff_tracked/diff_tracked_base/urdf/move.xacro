@@ -6,7 +6,7 @@
 
       <commandTopic>/cmd_vel</commandTopic>
       <odometryTopic>/gz_odom</odometryTopic>
-      <odometryFrame>world</odometryFrame>
+      <odometryFrame>odom</odometryFrame>
       <robotBaseFrame>base_link</robotBaseFrame>
 
       <odometryRate>100.0</odometryRate>

@@ -1,7 +1,9 @@
 <launch>
   <arg name="distance" default="45.0"/>
-  <arg name="speed" default="0.8"/>
+  <arg name="speed" default="2.0"/>
   <arg name="odom_topic" default="/gz_odom"/>
+  <arg name="initial_heading_deg" default="0.0"/>
+  <arg name="startup_delay" default="2.0"/>
 
   <node pkg="diff_tracked_control" type="line_rpp_controller_node" name="line_rpp_controller_node" output="screen">
     <param name="odom_topic" value="$(arg odom_topic)"/>
@@ -13,6 +15,8 @@
     <param name="actual_path_max_poses" value="2000"/>
     <param name="target_distance" value="$(arg distance)"/>
     <param name="cruise_speed" value="$(arg speed)"/>
+    <param name="initial_heading_deg" value="$(arg initial_heading_deg)"/>
+    <param name="startup_delay" value="$(arg startup_delay)"/>
 
     <param name="lookahead_distance" value="1.0"/>
     <param name="min_lookahead_distance" value="0.8"/>
