@@ -1,8 +1,16 @@
 <robot name="bunker_laser_3d"
   xmlns:xacro="http://wiki.ros.org/xacro">
+  <xacro:arg name="use_3d_lidar" default="false"/>
+
+  <xacro:if value="$(arg use_3d_lidar)">
+    <xacro:include filename="laser_3d_driver.xacro"/>
+  </xacro:if>
+  <xacro:unless value="$(arg use_3d_lidar)">
+    <xacro:include filename="laser_2d_driver.xacro"/>
+  </xacro:unless>
+
   <xacro:include filename="bunker.xacro" />
   <xacro:include filename="laser.xacro" />
-  <xacro:include filename="laser_3d_driver.xacro" />
   <xacro:include filename="imu.xacro" />
   <xacro:include filename="imu_driver.xacro" />
   <xacro:include filename="imu_pose_gt.xacro" />

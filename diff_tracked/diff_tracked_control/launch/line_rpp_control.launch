@@ -1,18 +1,27 @@
 <launch>
   <arg name="distance" default="45.0"/>
-  <arg name="speed" default="0.8"/>
-  <arg name="odom_topic" default="/gz_odom"/>
+  <arg name="speed" default="2.0"/>
+  <arg name="odom_topic" default="/odom"/>
+  <arg name="map_frame" default="map"/>
+  <arg name="base_frame" default="base_link"/>
+  <arg name="initial_heading_deg" default="0.0"/>
+  <arg name="startup_delay" default="2.0"/>
 
   <node pkg="diff_tracked_control" type="line_rpp_controller_node" name="line_rpp_controller_node" output="screen">
     <param name="odom_topic" value="$(arg odom_topic)"/>
     <param name="cmd_vel_topic" value="/cmd_vel"/>
     <param name="planned_path_topic" value="/planned_path"/>
     <param name="actual_path_topic" value="/actual_path"/>
+    <param name="map_frame" value="$(arg map_frame)"/>
+    <param name="base_frame" value="$(arg base_frame)"/>
+    <param name="transform_timeout" value="0.05"/>
     <param name="planned_path_resolution" value="0.25"/>
     <param name="actual_path_min_distance" value="0.05"/>
     <param name="actual_path_max_poses" value="2000"/>
     <param name="target_distance" value="$(arg distance)"/>
     <param name="cruise_speed" value="$(arg speed)"/>
+    <param name="initial_heading_deg" value="$(arg initial_heading_deg)"/>
+    <param name="startup_delay" value="$(arg startup_delay)"/>
 
     <param name="lookahead_distance" value="1.0"/>
     <param name="min_lookahead_distance" value="0.8"/>

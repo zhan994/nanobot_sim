@@ -6,8 +6,8 @@
 
       <commandTopic>/cmd_vel</commandTopic>
       <odometryTopic>/gz_odom</odometryTopic>
-      <odometryFrame>world</odometryFrame>
-      <robotBaseFrame>base_link</robotBaseFrame>
+      <odometryFrame>odom</odometryFrame>
+      <robotBaseFrame>gazebo_base_link</robotBaseFrame>
 
       <odometryRate>100.0</odometryRate>
 
@@ -15,7 +15,7 @@
       <rightFrontJoint>wheel2_2_joint</rightFrontJoint>
       <leftRearJoint>wheel3_1_joint</leftRearJoint>
       <rightRearJoint>wheel4_1_joint</rightRearJoint>
-      <robotBaseFrame>base_link</robotBaseFrame>
+
 
     </plugin>
   </gazebo>

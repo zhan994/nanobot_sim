@@ -5,17 +5,21 @@
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/Quaternion.h>
+#include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
 #include <nav_msgs/Path.h>
 #include <ros/ros.h>
-#include <std_msgs/Header.h>
+#include <tf2/exceptions.h>
+#include <tf2_ros/buffer.h>
+#include <tf2_ros/transform_listener.h>
 
 namespace diff_tracked_control {
 
 class RegulatedPurePursuitController {
 public:
-  RegulatedPurePursuitController() : private_nh_("~") {}
+  RegulatedPurePursuitController()
+      : private_nh_("~"), tf_listener_(tf_buffer_) {}
 
   bool Initialize() {
     LoadParameters();
@@ -23,6 +27,7 @@ public:
     if (!ValidateParameters()) {
       return false;
     }
+
     //公共订阅，绝对话题
     cmd_vel_publisher_ = nh_.advertise<geometry_msgs::Twist>(cmd_vel_topic_, 1);
 
@@ -51,13 +56,17 @@ private:
                       std::string("/planned_path"));
     private_nh_.param("actual_path_topic", actual_path_topic_,
                       std::string("/actual_path"));
-
+    private_nh_.param("map_frame", map_frame_, std::string("map"));
+    private_nh_.param("base_frame", base_frame_, std::string("base_link"));
+    private_nh_.param("transform_timeout", transform_timeout_, 0.05);
     private_nh_.param("target_distance", target_distance_, 5.0);
     private_nh_.param("cruise_speed", desired_speed_, 0.5);
+    private_nh_.param("initial_heading_deg", initial_heading_deg_, -90.0);
     private_nh_.param("min_linear_speed", min_linear_speed_, 0.05);
     private_nh_.param("max_angular_speed", max_angular_speed_, 1.0);
     private_nh_.param("distance_tolerance", distance_tolerance_, 0.03);
     private_nh_.param("control_rate", control_rate_, 20.0);
+    private_nh_.param("startup_delay", startup_delay_, 2.0);
 
     private_nh_.param("lookahead_distance", lookahead_distance_, 0.5);
     private_nh_.param("min_lookahead_distance", min_lookahead_distance_, 0.25);
@@ -90,6 +99,21 @@ private:
       return false;
     }
 
+    if (!std::isfinite(initial_heading_deg_)) {
+      ROS_ERROR("~initial_heading_deg must be finite");
+      return false;
+    }
+
+    if (map_frame_.empty() || base_frame_.empty()) {
+      ROS_ERROR("~map_frame and ~base_frame must not be empty");
+      return false;
+    }
+
+    if (transform_timeout_ < 0.0) {
+      ROS_ERROR("~transform_timeout must be non-negative");
+      return false;
+    }
+
     if (!CheckPositive("max_angular_speed", max_angular_speed_)) {
       return false;
     }
@@ -99,6 +123,11 @@ private:
     }
 
     if (!CheckPositive("control_rate", control_rate_)) {
+      return false;
+    }
+
+    if (startup_delay_ < 0.0) {
+      ROS_ERROR("~startup_delay must be non-negative");
       return false;
     }
 
@@ -199,48 +228,55 @@ private:
     return std::atan2(siny_cosp, cosy_cosp);
   }
 
-  ros::Time MessageStamp(const std_msgs::Header &header) const {
-    if (header.stamp.isZero()) {
-      return ros::Time::now();
-    }
-    return header.stamp;
-  }
-
   void OdomCallback(const nav_msgs::Odometry::ConstPtr &message) {
     latest_odom_ = *message;
     has_latest_odom_ = true;
+  }
 
-    if (!has_start_pose_) {
-      start_x_ = message->pose.pose.position.x;
-      start_y_ = message->pose.pose.position.y;
-      start_yaw_ = YawFromQuaternion(message->pose.pose.orientation);
+  bool LookupRobotPose(geometry_msgs::Pose &robot_pose,
+                       ros::Time &transform_stamp) {
+    try {
+      const geometry_msgs::TransformStamped transform =
+          tf_buffer_.lookupTransform(map_frame_, base_frame_, ros::Time(0),
+                                     ros::Duration(transform_timeout_));
 
-      has_start_pose_ = true;
-
-      ROS_INFO("RPP start at (%.3f, %.3f), yaw %.3f rad", start_x_, start_y_,
-               start_yaw_);
-
-      PublishPlannedPath(*message);
-    }
-
-    if (!finished_) {
-      RecordActualPath(*message);
+      robot_pose.position.x = transform.transform.translation.x;
+      robot_pose.position.y = transform.transform.translation.y;
+      robot_pose.position.z = transform.transform.translation.z;
+      robot_pose.orientation = transform.transform.rotation;
+      transform_stamp = transform.header.stamp;
+      return true;
+    } catch (const tf2::TransformException &exception) {
+      ROS_WARN_THROTTLE(1.0, "Cannot transform %s -> %s: %s",
+                        map_frame_.c_str(), base_frame_.c_str(),
+                        exception.what());
+      return false;
     }
   }
 
-  void PublishPlannedPath(const nav_msgs::Odometry &odom) {
-    //如果里程计消息的 frame_id 不为空，就使用它,否则默认odom
-    const std::string frame_id =
-        odom.header.frame_id.empty() ? "odom" : odom.header.frame_id;
+  void InitializeStartPose(const geometry_msgs::Pose &robot_pose,
+                           const ros::Time &stamp) {
+    start_x_ = robot_pose.position.x;
+    start_y_ = robot_pose.position.y;
+    start_yaw_ = initial_heading_deg_ * std::acos(-1.0) / 180.0;
+    startup_wall_time_ = ros::WallTime::now();
+    startup_delay_started_ = true;
+    has_start_pose_ = true;
 
-    const ros::Time stamp = MessageStamp(odom.header);
+    ROS_INFO("RPP map start at (%.3f, %.3f), planned heading %.1f deg "
+             "(%.3f rad)",
+             start_x_, start_y_, initial_heading_deg_, start_yaw_);
 
+    PublishPlannedPath(stamp);
+  }
+
+  void PublishPlannedPath(const ros::Time &stamp) {
     const int segment_count =
         std::max(1, static_cast<int>(std::ceil(target_distance_ /
                                                planned_path_resolution_)));
 
     nav_msgs::Path path;
-    path.header.frame_id = frame_id;
+    path.header.frame_id = map_frame_;
     path.header.stamp = stamp;
 
     for (int index = 0; index <= segment_count; ++index) {
@@ -248,7 +284,7 @@ private:
                               static_cast<double>(segment_count);
 
       geometry_msgs::PoseStamped pose;
-      pose.header.frame_id = frame_id;
+      pose.header.frame_id = map_frame_;
       pose.header.stamp = stamp;
 
       pose.pose.position.x = start_x_ + distance * std::cos(start_yaw_);
@@ -266,8 +302,9 @@ private:
              path.poses.size());
   }
 
-  void RecordActualPath(const nav_msgs::Odometry &odom) {
-    const geometry_msgs::Point &position = odom.pose.pose.position;
+  void RecordActualPath(const geometry_msgs::Pose &robot_pose,
+                        const ros::Time &stamp) {
+    const geometry_msgs::Point &position = robot_pose.position;
 
     if (has_last_actual_position_) {
       const double dx = position.x - last_actual_x_;
@@ -278,15 +315,12 @@ private:
       }
     }
 
-    const std::string frame_id =
-        odom.header.frame_id.empty() ? "odom" : odom.header.frame_id;
-
     geometry_msgs::PoseStamped pose;
-    pose.header.frame_id = frame_id;
-    pose.header.stamp = MessageStamp(odom.header);
-    pose.pose = odom.pose.pose;
+    pose.header.frame_id = map_frame_;
+    pose.header.stamp = stamp;
+    pose.pose = robot_pose;
 
-    actual_path_.header.frame_id = frame_id;
+    actual_path_.header.frame_id = map_frame_;
     actual_path_.header.stamp = pose.header.stamp;
     actual_path_.poses.push_back(pose);
 
@@ -303,10 +337,42 @@ private:
   }
 
   void ControlCallback(const ros::TimerEvent &event) {
-    if (!has_latest_odom_ || !has_start_pose_) {
+    if (!has_latest_odom_) {
       ROS_WARN_THROTTLE(2.0, "waiting for odometry on %s", odom_topic_.c_str());
+      PublishStop();
       return;
     }
+
+    geometry_msgs::Pose robot_pose;
+    ros::Time transform_stamp;
+    if (!LookupRobotPose(robot_pose, transform_stamp)) {
+      PublishStop();
+      return;
+    }
+
+    if (transform_stamp.isZero()) {
+      transform_stamp = ros::Time::now();
+    }
+
+    if (!has_start_pose_) {
+      InitializeStartPose(robot_pose, transform_stamp);
+    }
+
+    if (!finished_) {
+      RecordActualPath(robot_pose, transform_stamp);
+    }
+
+    if (startup_delay_started_) {
+      const double startup_elapsed =
+          (ros::WallTime::now() - startup_wall_time_).toSec();
+      if (startup_elapsed < startup_delay_) {
+        ROS_INFO_THROTTLE(1.0, "Controller startup delay: %.1f s remaining",
+                          startup_delay_ - startup_elapsed);
+        PublishStop();
+        return;
+      }
+    }
+
     //最近里程计消息的时间
     const ros::Time odom_stamp = latest_odom_.header.stamp;
 
@@ -338,12 +404,9 @@ private:
       return;
     }
 
-    const geometry_msgs::Pose &robot_pose = latest_odom_.pose.pose;
-
     const double robot_x = robot_pose.position.x;
     const double robot_y = robot_pose.position.y;
-    const double robot_yaw =
-        YawFromQuaternion(latest_odom_.pose.pose.orientation);
+    const double robot_yaw = YawFromQuaternion(robot_pose.orientation);
 
     const double dx = robot_x - start_x_;
     const double dy = robot_y - start_y_;
@@ -477,6 +540,8 @@ private:
 
   ros::NodeHandle nh_;
   ros::NodeHandle private_nh_;
+  tf2_ros::Buffer tf_buffer_;
+  tf2_ros::TransformListener tf_listener_;
 
   ros::Publisher cmd_vel_publisher_;
   ros::Publisher planned_path_publisher_;
@@ -489,6 +554,10 @@ private:
   std::string cmd_vel_topic_;
   std::string planned_path_topic_;
   std::string actual_path_topic_;
+  std::string map_frame_;
+  std::string base_frame_;
+
+  double transform_timeout_ = 0.05;
 
   double target_distance_ = 5.0;
   double desired_speed_ = 0.5;
@@ -496,6 +565,7 @@ private:
   double max_angular_speed_ = 1.0;
   double distance_tolerance_ = 0.03;
   double control_rate_ = 20.0;
+  double startup_delay_ = 2.0;
 
   double lookahead_distance_ = 0.5;
   double min_lookahead_distance_ = 0.25;
@@ -518,11 +588,15 @@ private:
 
   bool has_start_pose_ = false;
   bool has_latest_odom_ = false;
+  bool startup_delay_started_ = false;
   bool finished_ = false;
+
+  ros::WallTime startup_wall_time_;
 
   double start_x_ = 0.0;
   double start_y_ = 0.0;
   double start_yaw_ = 0.0;
+  double initial_heading_deg_ = 0.0;
 
   nav_msgs::Odometry latest_odom_;
   nav_msgs::Path actual_path_;

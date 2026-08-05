@@ -8,6 +8,8 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   roscpp
   rospy
+  tf2
+  tf2_ros
 )
 
 catkin_package(
@@ -15,6 +17,8 @@ catkin_package(
     geometry_msgs
     nav_msgs
     roscpp
+    tf2
+    tf2_ros
 )
 
 include_directories(
@@ -37,4 +41,3 @@ target_link_libraries(line_rpp_controller_node
 install(TARGETS line_rpp_controller_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
-
