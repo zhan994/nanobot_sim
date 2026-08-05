@@ -100,7 +100,7 @@ chmod +x ./scripts/rspx4.sh
 >
 > 计算量从高到低：`airylike_lidar` > `airylike_light` > `airylike_mini`。
 >
-> 默认模型：`airylike_lidar/airylike_lidar.sdf`。
+> 默认模型：`airylike_light/airylike_light.sdf`。
 
 例如：
 

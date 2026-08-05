@@ -99,7 +99,7 @@ chmod +x ./scripts/rspx4.sh
 >
 > Computational cost, from highest to lowest: `airylike_lidar` > `airylike_light` > `airylike_mini`.
 >
-> Default model: `airylike_lidar/airylike_lidar.sdf`.
+> Default model: `airylike_light/airylike_light.sdf`.
 
 For example:
 
