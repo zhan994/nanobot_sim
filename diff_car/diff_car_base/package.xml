@@ -2,13 +2,20 @@
 <package format="2">
   <name>diff_car_base</name>
   <version>0.0.0</version>
-  <description>The diff_car package</description>
+  <description>URDF and visualization resources for diff_car.</description>
+
   <maintainer email="zhanzhihao_dt@163.com">zhan</maintainer>
   <license>TODO</license>
+
   <buildtool_depend>catkin</buildtool_depend>
-  <depend>urdf</depend>
-  <depend>xacro</depend>
-  <depend>gazebo_ros</depend>
-  <depend>gazebo_ros_control</depend>
-  <depend>gazebo_plugins</depend>
+
+  <exec_depend>xacro</exec_depend>
+  <exec_depend>urdf</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>joint_state_publisher_gui</exec_depend>
+  <exec_depend>rviz</exec_depend>
+
+  <!-- 当前 Gazebo 插件仍然位于本 package 的 xacro 中 -->
+  <exec_depend>gazebo_plugins</exec_depend>
+  <exec_depend>velodyne_gazebo_plugins</exec_depend>
 </package>

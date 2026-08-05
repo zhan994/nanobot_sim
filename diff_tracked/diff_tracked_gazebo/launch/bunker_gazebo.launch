@@ -1,0 +1,20 @@
+<launch>
+  <!-- The lowest wheel collision is about 0.353 m below base_link. -->
+  <arg name="spawn_z" default="0.40"/>
+  <arg name="world_name" default="$(find gazebo_worlds)/worlds/staggered_blocks_50m.world"/>
+
+  <include file="$(find gazebo_worlds)/launch/world.launch">
+    <arg name="world_name" value="$(arg world_name)"/>
+  </include>
+
+  <!-- Load the URDF into the ROS Parameter Server -->
+  <param name="robot_description" command="$(find xacro)/xacro '$(find diff_tracked_base)/urdf/bunker_laser_3d.xacro'"/>
+  <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
+  <node pkg="gazebo_ros" type="spawn_model" name="spawn_model" args="-unpause -urdf -model bunker -param robot_description -x 0.0 -y 0.0 -z $(arg spawn_z)" />
+
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" />
+  <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" />
+
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find diff_tracked_gazebo)/rviz/display.rviz" />
+
+</launch>

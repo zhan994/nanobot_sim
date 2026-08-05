@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<robot name="tracked_lidar_driver" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:property name="PI" value="3.1415926"/>
+  <gazebo reference="laser">
+    <sensor name="tracked_lidar_sensor" type="ray">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>false</visualize>
+      <update_rate>10</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>1800</samples>
+            <resolution>1</resolution>
+            <min_angle>-${PI}</min_angle>
+            <max_angle> ${PI}</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>32</samples>
+            <resolution>1</resolution>
+            <min_angle>-${10.0*PI/180.0}</min_angle>
+            <max_angle> ${30.0*PI/180.0}</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.15</min>
+          <max>100.0</max>
+          <resolution>0.001</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.0</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_laser_controller" filename="libgazebo_ros_velodyne_laser.so">
+        <topicName>/scan</topicName>
+        <frameName>laser</frameName>
+        <organize_cloud>false</organize_cloud>
+        <min_range>0.9</min_range>
+        <max_range>100</max_range>
+        <gaussianNoise>0.008</gaussianNoise>
+      </plugin>
+    </sensor>
+  </gazebo>
+</robot>

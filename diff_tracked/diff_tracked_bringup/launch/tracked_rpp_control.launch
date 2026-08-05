@@ -1,0 +1,16 @@
+<launch>
+  <arg name="start_gazebo" default="true"/>
+  <arg name="start_control" default="true"/>
+
+  <arg name="distance" default="50.0"/>
+  <arg name="speed" default="0.8"/>
+  <arg name="odom_topic" default="/gz_odom"/>
+
+  <include if="$(arg start_gazebo)" file="$(find diff_tracked_gazebo)/launch/bunker_gazebo.launch" />
+
+  <include if="$(arg start_control)" file="$(find diff_tracked_control)/launch/line_rpp_control.launch">
+    <arg name="distance" value="$(arg distance)"/>
+    <arg name="speed" value="$(arg speed)"/>
+    <arg name="odom_topic" value="$(arg odom_topic)"/>
+  </include>
+</launch>

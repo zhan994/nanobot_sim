@@ -1,0 +1,23 @@
+<robot name="bunker_move"
+  xmlns:xacro="http://wiki.ros.org/xacro">
+
+  <gazebo>
+    <plugin name="planar_move_controller" filename="libgazebo_ros_planar_move.so">
+
+      <commandTopic>/cmd_vel</commandTopic>
+      <odometryTopic>/gz_odom</odometryTopic>
+      <odometryFrame>world</odometryFrame>
+      <robotBaseFrame>base_link</robotBaseFrame>
+
+      <odometryRate>100.0</odometryRate>
+
+      <leftFrontJoint>wheel1_2_joint</leftFrontJoint>
+      <rightFrontJoint>wheel2_2_joint</rightFrontJoint>
+      <leftRearJoint>wheel3_1_joint</leftRearJoint>
+      <rightRearJoint>wheel4_1_joint</rightRearJoint>
+      <robotBaseFrame>base_link</robotBaseFrame>
+
+    </plugin>
+  </gazebo>
+
+</robot>

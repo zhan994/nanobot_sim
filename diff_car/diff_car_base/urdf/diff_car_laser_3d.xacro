@@ -1,0 +1,13 @@
+<robot name="diff_car_laser_3d"
+  xmlns:xacro="http://wiki.ros.org/xacro">
+  <xacro:include filename="head.xacro" />
+  <xacro:include filename="base.xacro" />
+  <xacro:include filename="laser.xacro" />
+  <xacro:include filename="laser_3d_driver.xacro" />
+  <xacro:include filename="imu.xacro" />
+  <xacro:include filename="imu_driver.xacro" />
+  <xacro:include filename="camera.xacro" />
+  <xacro:include filename="camera_driver.xacro" />
+  <xacro:include filename="imu_pose_gt.xacro" />
+  <xacro:include filename="move.xacro" />
+</robot>
