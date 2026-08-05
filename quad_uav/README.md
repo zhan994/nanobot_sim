@@ -1,7 +1,5 @@
 # quad_uav
 
-[English](README.md) | [简体中文](README_CN.md)
-
 - **quad_uav_gazebo**: PX4-SITL Gazebo simulation.
 - **quad_uav_planner**: usage examples for Diff-Planner.
 
