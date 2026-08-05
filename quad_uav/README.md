@@ -96,6 +96,8 @@ chmod +x ./scripts/rspx4.sh
 ./scripts/rspx4.sh
 ```
 
+> `rspx4.sh` also publishes the identity transform from `world` to `map`.
+
 - Terminal 2: px4ctrl
 
 ```bash
@@ -127,11 +129,3 @@ roslaunch diff_planner gz_single_drone.launch enable_rviz:=true
 ```
 
 > After takeoff, wait for the UAV to hover, then set a target in RViz with **2D Nav Goal**. Alternatively, enter `gl <x> <y> <z>` in `uav_cli.py` to publish a 3D goal. Add objects in Gazebo to create obstacle-avoidance scenarios.
-
-- Terminal 6: world-to-map transform
-
-> Diff-Planner uses `world` as its global reference frame, while other components use `map`. Launch the identity transform below to connect the two frames (`world` → `map`).
-
-```bash
-cd <path-to-nanobot-ws> && source devel/setup.bash && roslaunch quad_uav_gazebo map_world_tf.launch
-```

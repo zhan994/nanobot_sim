@@ -96,6 +96,8 @@ chmod +x ./scripts/rspx4.sh
 ./scripts/rspx4.sh
 ```
 
+> `rspx4.sh` 会同时发布从 `world` 到 `map` 的恒等变换。
+
 - 终端 2：px4ctrl
 
 ```bash
@@ -125,11 +127,3 @@ roslaunch diff_planner gz_single_drone.launch enable_rviz:=true
 ```
 
 > 无人机起飞后，等待其进入悬停状态，然后在 RViz 中使用 **2D Nav Goal** 设置目标。也可在 `uav_cli.py` 中输入 `gl <x> <y> <z>` 发布三维目标。可在 Gazebo 中添加物体，构建避障测试场景。
-
-- 终端 6：`world` 到 `map` 坐标变换
-
-> Diff-Planner 使用 `world` 作为全局参考坐标系，而其他组件使用 `map`。启动下面的恒等变换，连接这两个坐标系（`world` → `map`）。
-
-```bash
-cd <path-to-nanobot-ws> && source devel/setup.bash && roslaunch quad_uav_gazebo map_world_tf.launch
-```
