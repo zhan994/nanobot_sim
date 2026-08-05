@@ -32,14 +32,6 @@ git clone -b dev_nanobot https://github.com/zhan994/PX4-Autopilot.git --recursiv
 
 cd px4_dev
 sudo chmod +x ./Tools/setup/ubuntu.sh
-
-# In ./Tools/setup/requirements.txt, replace `matplotlib>=3.0.*` with:
-matplotlib>=3.0
-
-# Optional: replace the download source near line 176 of ./Tools/setup/ubuntu.sh
-wget -O /tmp/gcc-arm-none-eabi-${NUTTX_GCC_VERSION}-linux.tar.bz2 https://mirrors.tuna.tsinghua.edu.cn/armbian-releases/_toolchains/gcc-arm-none-eabi-${NUTTX_GCC_VERSION}-${INSTALL_ARCH}-linux.tar.bz2 && \
-sudo tar -jxf /tmp/gcc-arm-none-eabi-${NUTTX_GCC_VERSION}-linux.tar.bz2 -C /opt/;
-
 bash ./Tools/setup/ubuntu.sh
 
 # Reboot with `sudo reboot` if required, then verify that Gazebo starts
