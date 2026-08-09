@@ -1,3 +1,5 @@
+
+
 # NanoBot_Sim
 
 ***A repo. which maintains simulation tools in Gazebo for Robotics.***
@@ -52,6 +54,7 @@ cd ws_nanobot_sim/src
 git clone git@github.com:zhan994/nanobot_sim.git
 cd ..
 catkin_make
+source devel/setup.bash
 ```
 
 Launch a world without spawning a vehicle:
