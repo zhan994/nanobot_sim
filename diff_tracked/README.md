@@ -10,7 +10,7 @@
 Gazebo simulation with keyboard control:
 
 ```bash
-roslaunch diff_car_gazebo bunker_gazebo.launch
+roslaunch diff_tracked_gazebo bunker_gazebo.launch
 rosrun teleop_twist_keyboard teleop_twist_keyboard.py _speed:=0.3 _turn:=1.0 _repeat_rate:=10.0 _key_timeout:=0.5 cmd_vel:=/cmd_vel
 ```
 

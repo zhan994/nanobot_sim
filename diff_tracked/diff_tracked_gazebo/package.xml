@@ -29,6 +29,7 @@
   <exec_depend>gazebo_msgs</exec_depend>    
   <exec_depend>velodyne_gazebo_plugins</exec_depend>
   <exec_depend>diff_tracked_base</exec_depend>
+  <exec_depend>gazebo_worlds</exec_depend>
   <exec_depend>rostopic</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->

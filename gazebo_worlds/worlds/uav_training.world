@@ -1,0 +1,231 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <world name="uav_training">
+    <gravity>0 0 -9.81</gravity>
+    <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+
+    <physics name="default_physics" type="ode">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+
+    <scene>
+      <ambient>0.45 0.45 0.45 1</ambient>
+      <background>0.72 0.82 0.92 1</background>
+      <shadows>true</shadows>
+    </scene>
+
+    <light name="sun" type="directional">
+      <pose>0 0 20 0 0 0</pose>
+      <cast_shadows>true</cast_shadows>
+      <diffuse>0.9 0.9 0.85 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.4 0.2 -0.9</direction>
+    </light>
+
+    <!-- 30 m x 30 m ground. The vehicle spawns at the clear center pad. -->
+    <model name="ground">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box><size>30 30 0.1</size></box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box><size>30 30 0.1</size></box>
+          </geometry>
+          <material>
+            <ambient>0.18 0.22 0.18 1</ambient>
+            <diffuse>0.25 0.32 0.25 1</diffuse>
+          </material>
+        </visual>
+      </link>
+      <pose>0 0 -0.05 0 0 0</pose>
+    </model>
+
+    <!-- High-contrast takeoff pad at the default PX4 spawn point. -->
+    <model name="takeoff_pad">
+      <static>true</static>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <cylinder><radius>1.5</radius><length>0.012</length></cylinder>
+          </geometry>
+          <material>
+            <ambient>0.08 0.08 0.08 1</ambient>
+            <diffuse>0.1 0.1 0.1 1</diffuse>
+          </material>
+        </visual>
+        <visual name="center">
+          <pose>0 0 0.008 0 0 0</pose>
+          <geometry>
+            <cylinder><radius>0.45</radius><length>0.015</length></cylinder>
+          </geometry>
+          <material>
+            <ambient>0.9 0.75 0.05 1</ambient>
+            <diffuse>1 0.82 0.08 1</diffuse>
+          </material>
+        </visual>
+      </link>
+      <pose>0 0 0.006 0 0 0</pose>
+    </model>
+
+    <!-- Arena boundary walls. -->
+    <model name="wall_north">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>30 0.25 2.5</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>30 0.25 2.5</size></box></geometry>
+          <material><ambient>0.55 0.57 0.60 1</ambient><diffuse>0.65 0.68 0.72 1</diffuse></material>
+        </visual>
+      </link>
+      <pose>0 14.875 1.25 0 0 0</pose>
+    </model>
+    <model name="wall_south">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>30 0.25 2.5</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>30 0.25 2.5</size></box></geometry>
+          <material><ambient>0.55 0.57 0.60 1</ambient><diffuse>0.65 0.68 0.72 1</diffuse></material>
+        </visual>
+      </link>
+      <pose>0 -14.875 1.25 0 0 0</pose>
+    </model>
+    <model name="wall_east">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.25 29.5 2.5</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.25 29.5 2.5</size></box></geometry>
+          <material><ambient>0.55 0.57 0.60 1</ambient><diffuse>0.65 0.68 0.72 1</diffuse></material>
+        </visual>
+      </link>
+      <pose>14.875 0 1.25 0 0 0</pose>
+    </model>
+    <model name="wall_west">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.25 29.5 2.5</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.25 29.5 2.5</size></box></geometry>
+          <material><ambient>0.55 0.57 0.60 1</ambient><diffuse>0.65 0.68 0.72 1</diffuse></material>
+        </visual>
+      </link>
+      <pose>-14.875 0 1.25 0 0 0</pose>
+    </model>
+
+    <!-- A 2.8 m wide, 2.5 m high flight gate east of the start pad. -->
+    <model name="flight_gate">
+      <static>true</static>
+      <link name="left_post">
+        <pose>0 1.7 1.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>0.35 0.35 3</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.35 0.35 3</size></box></geometry>
+          <material><ambient>0.85 0.18 0.04 1</ambient><diffuse>1 0.25 0.05 1</diffuse></material>
+        </visual>
+      </link>
+      <link name="right_post">
+        <pose>0 -1.7 1.5 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>0.35 0.35 3</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.35 0.35 3</size></box></geometry>
+          <material><ambient>0.85 0.18 0.04 1</ambient><diffuse>1 0.25 0.05 1</diffuse></material>
+        </visual>
+      </link>
+      <link name="top">
+        <pose>0 0 3.325 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>0.35 3.75 0.35</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.35 3.75 0.35</size></box></geometry>
+          <material><ambient>0.85 0.18 0.04 1</ambient><diffuse>1 0.25 0.05 1</diffuse></material>
+        </visual>
+      </link>
+      <pose>7 0 0 0 0 0</pose>
+    </model>
+
+    <!-- Slalom pillars for lidar and local-planning tests. -->
+    <model name="pillar_1">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision"><geometry><cylinder><radius>0.55</radius><length>3</length></cylinder></geometry></collision>
+        <visual name="visual">
+          <geometry><cylinder><radius>0.55</radius><length>3</length></cylinder></geometry>
+          <material><ambient>0.05 0.35 0.75 1</ambient><diffuse>0.08 0.45 0.95 1</diffuse></material>
+        </visual>
+      </link>
+      <pose>-6 -4 1.5 0 0 0</pose>
+    </model>
+    <model name="pillar_2">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision"><geometry><cylinder><radius>0.65</radius><length>4</length></cylinder></geometry></collision>
+        <visual name="visual">
+          <geometry><cylinder><radius>0.65</radius><length>4</length></cylinder></geometry>
+          <material><ambient>0.05 0.35 0.75 1</ambient><diffuse>0.08 0.45 0.95 1</diffuse></material>
+        </visual>
+      </link>
+      <pose>-8 1 2 0 0 0</pose>
+    </model>
+    <model name="pillar_3">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision"><geometry><cylinder><radius>0.5</radius><length>2.4</length></cylinder></geometry></collision>
+        <visual name="visual">
+          <geometry><cylinder><radius>0.5</radius><length>2.4</length></cylinder></geometry>
+          <material><ambient>0.05 0.35 0.75 1</ambient><diffuse>0.08 0.45 0.95 1</diffuse></material>
+        </visual>
+      </link>
+      <pose>-5 6 1.2 0 0 0</pose>
+    </model>
+
+    <!-- Box obstacles of different heights. -->
+    <model name="box_low">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>3 2 1</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>3 2 1</size></box></geometry>
+          <material><ambient>0.72 0.58 0.08 1</ambient><diffuse>0.9 0.72 0.1 1</diffuse></material>
+        </visual>
+      </link>
+      <pose>4 7 0.5 0 0 0.25</pose>
+    </model>
+    <model name="box_tall">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>2.5 2.5 4</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>2.5 2.5 4</size></box></geometry>
+          <material><ambient>0.38 0.16 0.58 1</ambient><diffuse>0.52 0.22 0.76 1</diffuse></material>
+        </visual>
+      </link>
+      <pose>9 8 2 0 0 0</pose>
+    </model>
+
+    <!-- Offset wall creates a simple path-planning corner. -->
+    <model name="inner_wall">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.3 7 2.2</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.3 7 2.2</size></box></geometry>
+          <material><ambient>0.18 0.62 0.45 1</ambient><diffuse>0.22 0.78 0.56 1</diffuse></material>
+        </visual>
+      </link>
+      <pose>5 -8 1.1 0 0 0.35</pose>
+    </model>
+
+    <gui fullscreen="false">
+      <camera name="overview">
+        <pose>24 -24 19 0 0.45 2.35</pose>
+        <view_controller>orbit</view_controller>
+      </camera>
+    </gui>
+  </world>
+</sdf>

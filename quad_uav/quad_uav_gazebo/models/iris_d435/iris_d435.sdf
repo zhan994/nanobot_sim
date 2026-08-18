@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<sdf version='1.6'>
+  <model name='iris_d435'>
+
+    <include>
+      <uri>model://iris</uri>
+    </include>
+
+    <include>
+      <uri>model://D435i_light</uri>
+      <pose>0.12 0 0.08 0 0 0</pose>
+    </include>
+
+    <joint name="realsense_camera_joint" type="fixed">
+      <child>D435i_light::link</child>
+      <parent>iris::base_link</parent>
+    </joint>
+  </model>
+</sdf>
+<!-- vim: set noet fenc=utf-8 ff=unix sts=0 sw=4 ts=4 : -->

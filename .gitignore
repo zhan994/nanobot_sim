@@ -32,6 +32,7 @@ devel_isolated/
 # qcreator stuff
 CMakeLists.txt.user
 
+__pycache__/
 srv/_*.py
 *.pcd
 *.pyc
@@ -52,6 +53,4 @@ CATKIN_IGNORE
 .vscode/
 .catkin_workspace
 
-!/.gitignore
-!/diff_tracked/
-!/diff_tracked/**
+Diff-Planner

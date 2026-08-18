@@ -1,6 +1,8 @@
 <launch>
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find diff_car_gazebo)/worlds/iscas_museum.world"/>
+  <arg name="world_name" default="$(find gazebo_worlds)/worlds/iscas_museum.world"/>
+
+  <include file="$(find gazebo_worlds)/launch/world.launch">
+    <arg name="world_name" value="$(arg world_name)"/>
   </include>
 
   <param name="robot_description" command="$(find xacro)/xacro $(find diff_car_base)/urdf/diff_car_laser_3d.xacro" />

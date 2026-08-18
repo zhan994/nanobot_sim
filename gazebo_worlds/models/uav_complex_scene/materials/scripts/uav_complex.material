@@ -1,0 +1,79 @@
+material UAVComplex/Asphalt
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.62 0.62 0.62 1
+      diffuse 0.82 0.82 0.82 1
+      specular 0.08 0.08 0.08 1 12
+      texture_unit
+      {
+        texture asphalt.png
+        filtering anisotropic
+        max_anisotropy 8
+        scale 0.12 0.12
+      }
+    }
+  }
+}
+
+material UAVComplex/Grass
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.55 0.60 0.48 1
+      diffuse 0.82 0.88 0.72 1
+      specular 0.02 0.02 0.02 1 2
+      texture_unit
+      {
+        texture grass.png
+        filtering anisotropic
+        max_anisotropy 8
+        scale 0.08 0.08
+      }
+    }
+  }
+}
+
+material UAVComplex/Brick
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.58 0.45 0.39 1
+      diffuse 0.88 0.75 0.66 1
+      specular 0.03 0.03 0.03 1 4
+      texture_unit
+      {
+        texture brick.png
+        filtering anisotropic
+        max_anisotropy 8
+        scale 0.35 0.35
+      }
+    }
+  }
+}
+
+material UAVComplex/RustedSteel
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.42 0.50 0.48 1
+      diffuse 0.68 0.78 0.74 1
+      specular 0.12 0.12 0.12 1 10
+      texture_unit
+      {
+        texture rusted_steel.png
+        filtering anisotropic
+        max_anisotropy 8
+        scale 0.22 0.22
+      }
+    }
+  }
+}
