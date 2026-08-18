@@ -7,10 +7,12 @@
       <update_rate>100</update_rate>
       <pose>0 0 0 0 0 0</pose>
       <plugin name="tracked_imu_plugin" filename="libgazebo_ros_imu_sensor.so">
-        <topicName>/imu</topicName>
+        <!-- The virtual encoder node republishes this as /imu with
+             independently configurable covariance. -->
+        <topicName>/imu_raw</topicName>
         <bodyName>imu</bodyName>
         <updateRateHZ>100.0</updateRateHZ>
-        <gaussianNoise>0.0</gaussianNoise>
+        <gaussianNoise>0.001</gaussianNoise>
         <xyzOffset>0 0 0</xyzOffset>
         <rpyOffset>0 0 0</rpyOffset>
         <frameName>imu</frameName>

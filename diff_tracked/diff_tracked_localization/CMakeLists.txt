@@ -1,15 +1,14 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(diff_tracked_base)
+project(diff_tracked_localization)
 
-add_compile_options(-std=c++14)
+## Compile as C++11, supported in ROS Kinetic and newer
+# add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  nav_msgs
-  roscpp
-  sensor_msgs
+  robot_localization
 )
 
 ## System dependencies are found with CMake's conventions
@@ -102,7 +101,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  CATKIN_DEPENDS nav_msgs roscpp sensor_msgs
+#  INCLUDE_DIRS include
+#  LIBRARIES diff_tracked_localization
+#  CATKIN_DEPENDS robot_localization
+#  DEPENDS system_lib
 )
 
 ###########
@@ -112,24 +114,13 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
+# include
   ${catkin_INCLUDE_DIRS}
-)
-
-add_executable(virtual_encoder_odometry_node
-  src/virtual_encoder_odometry.cpp
-)
-
-add_dependencies(virtual_encoder_odometry_node
-  ${catkin_EXPORTED_TARGETS}
-)
-
-target_link_libraries(virtual_encoder_odometry_node
-  ${catkin_LIBRARIES}
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/bunker_description.cpp
+#   src/${PROJECT_NAME}/diff_tracked_localization.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -140,7 +131,7 @@ target_link_libraries(virtual_encoder_odometry_node
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/bunker_description_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/diff_tracked_localization_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -173,13 +164,9 @@ target_link_libraries(virtual_encoder_odometry_node
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-install(TARGETS virtual_encoder_odometry_node
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-install(DIRECTORY config launch meshes rviz urdf
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+# install(TARGETS ${PROJECT_NAME}_node
+#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
 
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
@@ -208,7 +195,7 @@ install(DIRECTORY config launch meshes rviz urdf
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_bunker_description.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_diff_tracked_localization.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

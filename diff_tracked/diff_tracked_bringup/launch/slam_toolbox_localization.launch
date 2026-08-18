@@ -1,0 +1,22 @@
+<launch>
+  <!-- Base filename only. slam_toolbox appends .posegraph and .data. -->
+  <arg name="posegraph_file"/>
+  <arg name="initial_pose_x" default="0.0"/>
+  <arg name="initial_pose_y" default="0.0"/>
+  <arg name="initial_pose_yaw" default="0.0"/>
+
+  <node pkg="slam_toolbox"
+        type="localization_slam_toolbox_node"
+        name="slam_toolbox"
+        output="screen">
+    <!-- Reuse this robot's base_link, /scan_2d and scan-matcher settings. -->
+    <rosparam command="load"
+              file="$(find slam_toolbox)/config/mapper_params_online_async.yaml"/>
+    <param name="mode" value="localization"/>
+    <param name="map_file_name" value="$(arg posegraph_file)"/>
+    <rosparam param="map_start_pose" subst_value="true">
+      [$(arg initial_pose_x), $(arg initial_pose_y), $(arg initial_pose_yaw)]
+    </rosparam>
+    <param name="enable_interactive_mode" value="false"/>
+  </node>
+</launch>
