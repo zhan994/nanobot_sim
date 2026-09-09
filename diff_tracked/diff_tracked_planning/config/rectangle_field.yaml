@@ -1,0 +1,20 @@
+# All geometry values use metres in the map frame.
+frame_id: map
+path_topic: /coverage_path
+
+origin_x: 0.5
+origin_y: 0.5
+field_length: 29.0
+field_width: 19.0
+
+robot_width: 1.0
+coverage_width: 3.0
+min_turning_radius: 1.5
+cruise_speed: 2.0
+turn_speed: 0.25
+
+headland_swaths: 2
+path_resolution: 0.1
+
+
+

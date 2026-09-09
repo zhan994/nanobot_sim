@@ -1,0 +1,77 @@
+<launch>
+  <arg name="odom_topic" default="/odom"/>
+  <arg name="path_topic" default="/coverage_path"/>
+  <arg name="map_frame" default="map"/>
+  <arg name="base_frame" default="base_link"/>
+  <arg name="speed" default="0.5"/>
+  <arg name="startup_delay" default="2.0"/>
+
+  <arg name="require_origin_confirmation" default="false"/>
+  <arg name="origin_pose_x" default="0.0"/>
+  <arg name="origin_pose_y" default="0.0"/>
+  <arg name="origin_pose_yaw" default="0.0"/>
+  <arg name="localization_pose_timeout" default="15.0"/>
+  <arg name="scan_topic" default="/scan_2d"/>
+  <arg name="origin_position_tolerance" default="0.30"/>
+  <arg name="origin_yaw_tolerance" default="0.35"/>
+  <arg name="localization_stable_duration" default="1.0"/>
+
+  <node pkg="diff_tracked_control"
+        type="path_rpp_controller_node"
+        name="path_rpp_controller_node"
+        output="screen">
+    <param name="odom_topic" value="$(arg odom_topic)"/>
+    <param name="path_topic" value="$(arg path_topic)"/>
+    <param name="cmd_vel_topic" value="/cmd_vel"/>
+    <param name="planned_path_topic" value="/planned_path"/>
+    <param name="actual_path_topic" value="/actual_path"/>
+    <param name="map_frame" value="$(arg map_frame)"/>
+    <param name="base_frame" value="$(arg base_frame)"/>
+    <param name="transform_timeout" value="0.05"/>
+
+    <param name="require_origin_confirmation"
+           value="$(arg require_origin_confirmation)"/>
+    <param name="origin_pose_x" value="$(arg origin_pose_x)"/>
+    <param name="origin_pose_y" value="$(arg origin_pose_y)"/>
+    <param name="origin_pose_yaw" value="$(arg origin_pose_yaw)"/>
+    <param name="localization_pose_timeout"
+           value="$(arg localization_pose_timeout)"/>
+    <param name="scan_topic" value="$(arg scan_topic)"/>
+    <param name="origin_position_tolerance"
+           value="$(arg origin_position_tolerance)"/>
+    <param name="origin_yaw_tolerance" value="$(arg origin_yaw_tolerance)"/>
+    <param name="localization_stable_duration"
+           value="$(arg localization_stable_duration)"/>
+
+    <param name="cruise_speed" value="$(arg speed)"/>
+    <param name="min_linear_speed" value="0.10"/>
+    <param name="max_angular_speed" value="2.0"/>
+    <param name="max_linear_accel" value="1.8"/>
+    <param name="max_linear_decel" value="1.0"/>
+    <param name="max_angular_accel" value="1.5"/>
+    <param name="regulated_min_radius" value="3.0"/>
+    <param name="max_lateral_accel" value="0.5"/>
+    <param name="approach_distance" value="2.0"/>
+
+    <param name="lookahead_distance" value="0.8"/>
+    <param name="min_lookahead_distance" value="0.5"/>
+    <param name="max_lookahead_distance" value="2.5"/>
+    <param name="lookahead_time" value="0.8"/>
+    <param name="curve_lookahead_gain" value="1.5"/>
+    <param name="curvature_sample_distance" value="0.4"/>
+    <param name="curve_speed_safety_factor" value="0.65"/>
+    <param name="path_search_distance" value="3.0"/>
+    <param name="path_backtrack_distance" value="0.5"/>
+    <param name="start_from_nearest" value="false"/>
+
+    <param name="rotate_in_place" value="true"/>
+    <param name="rotate_in_place_threshold" value="1.0"/>
+    <param name="rotate_in_place_speed" value="0.4"/>
+    <param name="distance_tolerance" value="0.10"/>
+    <param name="odom_timeout" value="1.0"/>
+    <param name="control_rate" value="20.0"/>
+    <param name="startup_delay" value="$(arg startup_delay)"/>
+    <param name="actual_path_min_distance" value="0.05"/>
+    <param name="actual_path_max_poses" value="5000"/>
+  </node>
+</launch>

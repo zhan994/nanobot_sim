@@ -19,6 +19,10 @@
   <arg name="speed" default="2.0"/>
   <arg name="initial_heading_deg" default="0.0"/>
   <arg name="control_startup_delay" default="5.0"/>
+  <arg name="localization_pose_timeout" default="15.0"/>
+  <arg name="origin_position_tolerance" default="0.30"/>
+  <arg name="origin_yaw_tolerance" default="0.35"/>
+  <arg name="localization_stable_duration" default="1.0"/>
   <!-- The controller and slam_toolbox use the EKF result, not Gazebo ground truth. -->
   <arg name="odom_topic" default="/odom"/>
 
@@ -52,8 +56,26 @@
     <arg name="distance" value="$(arg distance)"/>
     <arg name="speed" value="$(arg speed)"/>
     <arg name="odom_topic" value="$(arg odom_topic)"/>
+    <!-- map uses slam_toolbox's correction; odom is used only without SLAM. -->
+    <arg name="map_frame"
+         value="$(eval 'map' if arg('start_slam') or arg('start_slam_localization') else 'odom')"/>
     <arg name="initial_heading_deg" value="$(arg initial_heading_deg)"/>
     <arg name="startup_delay" value="$(arg control_startup_delay)"/>
+    <!-- In saved-map localization mode, keep /cmd_vel at zero until a fresh
+         /initialpose correction has converged and remained stable. -->
+    <arg name="require_origin_confirmation"
+         value="$(arg start_slam_localization)"/>
+    <arg name="origin_pose_x" value="$(arg localization_initial_x)"/>
+    <arg name="origin_pose_y" value="$(arg localization_initial_y)"/>
+    <arg name="origin_pose_yaw" value="$(arg localization_initial_yaw)"/>
+    <arg name="localization_pose_timeout"
+         value="$(arg localization_pose_timeout)"/>
+    <arg name="scan_topic" value="/scan_2d"/>
+    <arg name="origin_position_tolerance"
+         value="$(arg origin_position_tolerance)"/>
+    <arg name="origin_yaw_tolerance" value="$(arg origin_yaw_tolerance)"/>
+    <arg name="localization_stable_duration"
+         value="$(arg localization_stable_duration)"/>
   </include>
 
 </launch>

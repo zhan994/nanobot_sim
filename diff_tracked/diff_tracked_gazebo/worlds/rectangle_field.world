@@ -1,0 +1,114 @@
+<?xml version="1.0" ?>
+<sdf version="1.7">
+  <!--
+    Matches diff_tracked_planning/config/rectangle_field.yaml:
+      origin: (0, 0)
+      size:   30 m x 20 m
+
+    The inner faces of the four walls are exactly on the field boundary.
+  -->
+  <world name="rectangle_field">
+    <gravity>0 0 -9.8</gravity>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <physics name="default_physics" type="ode">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+
+    <!-- Green visual surface for x = 0..30 and y = 0..20. -->
+    <model name="field_surface">
+      <static>true</static>
+      <pose>15 10 0.002 0 0 0</pose>
+      <link name="surface">
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>30 20</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.18 0.42 0.12 1</ambient>
+            <diffuse>0.22 0.50 0.15 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- The 0.20 m thick walls sit outside the configured field. -->
+    <model name="field_boundary">
+      <static>true</static>
+
+      <link name="south_wall">
+        <pose>15 -0.10 0.50 0 0 0</pose>
+        <collision name="collision">
+          <geometry><box><size>30.4 0.2 1.0</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>30.4 0.2 1.0</size></box></geometry>
+          <material>
+            <ambient>0.72 0.72 0.72 1</ambient>
+            <diffuse>0.82 0.82 0.82 1</diffuse>
+          </material>
+        </visual>
+      </link>
+
+      <link name="north_wall">
+        <pose>15 20.10 0.50 0 0 0</pose>
+        <collision name="collision">
+          <geometry><box><size>30.4 0.2 1.0</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>30.4 0.2 1.0</size></box></geometry>
+          <material>
+            <ambient>0.72 0.72 0.72 1</ambient>
+            <diffuse>0.82 0.82 0.82 1</diffuse>
+          </material>
+        </visual>
+      </link>
+
+      <link name="west_wall">
+        <pose>-0.10 10 0.50 0 0 0</pose>
+        <collision name="collision">
+          <geometry><box><size>0.2 20.0 1.0</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.2 20.0 1.0</size></box></geometry>
+          <material>
+            <ambient>0.72 0.72 0.72 1</ambient>
+            <diffuse>0.82 0.82 0.82 1</diffuse>
+          </material>
+        </visual>
+      </link>
+
+      <link name="east_wall">
+        <pose>30.10 10 0.50 0 0 0</pose>
+        <collision name="collision">
+          <geometry><box><size>0.2 20.0 1.0</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.2 20.0 1.0</size></box></geometry>
+          <material>
+            <ambient>0.72 0.72 0.72 1</ambient>
+            <diffuse>0.82 0.82 0.82 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <gui fullscreen="0">
+      <camera name="field_camera">
+        <pose>15 -18 28 0 0.65 1.57</pose>
+        <view_controller>orbit</view_controller>
+      </camera>
+    </gui>
+  </world>
+</sdf>
