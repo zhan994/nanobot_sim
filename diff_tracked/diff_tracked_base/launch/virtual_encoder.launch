@@ -1,4 +1,8 @@
 <launch>
+  <arg name="initial_x" default="0.0"/>
+  <arg name="initial_y" default="0.0"/>
+  <arg name="initial_yaw" default="0.0"/>
+  
   <arg name="input_odom_topic" default="/gz_odom"/>
   <arg name="output_odom_topic" default="/encoder_odom"/>
   <arg name="joint_states_topic" default="/virtual_encoder/joint_states"/>
@@ -13,6 +17,9 @@
         type="virtual_encoder_odometry_node"
         name="virtual_encoder_odometry"
         output="screen">
+    <param name="initial_x" value="$(arg initial_x)"/>
+    <param name="initial_y" value="$(arg initial_y)"/>
+    <param name="initial_yaw" value="$(arg initial_yaw)"/>
     <param name="input_odom_topic" value="$(arg input_odom_topic)"/>
     <param name="output_odom_topic" value="$(arg output_odom_topic)"/>
     <param name="joint_states_topic" value="$(arg joint_states_topic)"/>

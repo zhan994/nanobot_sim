@@ -1,4 +1,8 @@
 <launch>
+  <arg name="initial_x" default="0.0"/>
+  <arg name="initial_y" default="0.0"/>
+  <arg name="initial_yaw" default="0.0"/>
+  
   <arg name="odom_input" default="/encoder_odom"/>
   <arg name="imu_input" default="/imu"/>
   <arg name="odom_output" default="/odom"/>
@@ -14,6 +18,14 @@
 
     <rosparam command="load"
               file="$(find diff_tracked_localization)/config/ekf_odom.yaml"/>
+
+    <rosparam param="initial_state" subst_value="true">
+      [$(arg initial_x), $(arg initial_y), 0.0,
+      0.0, 0.0, $(arg initial_yaw),
+      0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0]
+    </rosparam>
 
     <!-- 覆盖 YAML 中与运行环境相关的配置 -->
     <param name="odom0" value="$(arg odom_input)"/>

@@ -1,7 +1,11 @@
 <launch>
   <!-- The lowest wheel collision is about 0.353 m below base_link. -->
+  <arg name="spawn_x" default="0.0"/>
+  <arg name="spawn_y" default="0.0"/>
+  <arg name="spawn_yaw" default="0.0"/>
   <arg name="spawn_z" default="0.40"/>
-  <arg name="world_name" default="$(find gazebo_worlds)/worlds/staggered_blocks_50m.world"/>
+  <arg name="world_name"
+       default="$(find gazebo_worlds)/worlds/staggered_blocks_50m.world"/>
 
   <include file="$(find gazebo_worlds)/launch/world.launch">
     <arg name="world_name" value="$(arg world_name)"/>
@@ -15,7 +19,7 @@
     pkg="gazebo_ros" 
     type="spawn_model" 
     name="spawn_model" 
-    args="-unpause -urdf -model bunker -param robot_description -x 0.0 -y 0.0 -z $(arg spawn_z)" />
+    args="-unpause -urdf -model bunker -param robot_description -x $(arg spawn_x) -y $(arg spawn_y) -z $(arg spawn_z) -Y $(arg spawn_yaw)" />
 
   <!-- Start virtual encoder -->
   <include file="$(find diff_tracked_base)/launch/virtual_encoder.launch">
@@ -23,6 +27,9 @@
     <arg name="output_odom_topic" value="/encoder_odom"/>
     <arg name="wheel_separation" value="0.699"/>
     <arg name="wheel_radius" value="0.051"/>
+    <arg name="initial_x" value="$(arg spawn_x)"/>
+    <arg name="initial_y" value="$(arg spawn_y)"/>
+    <arg name="initial_yaw" value="$(arg spawn_yaw)"/>
   </include>
 
   <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" />

@@ -50,6 +50,10 @@ class VirtualEncoderOdometry {
     private_nh_.param("imu_linear_acceleration_covariance",
                       imu_linear_acceleration_covariance_, 1.0e-3);
 
+    private_nh_.param("initial_x", initial_x_, 0.0);
+    private_nh_.param("initial_y", initial_y_, 0.0);
+    private_nh_.param("initial_yaw", initial_yaw_, 0.0);
+
     if (wheel_separation_ <= 0.0 || wheel_radius_ <= 0.0 || max_dt_ <= 0.0) {
       ROS_ERROR("wheel_separation, wheel_radius and max_dt must be positive");
       return false;
@@ -109,9 +113,9 @@ class VirtualEncoderOdometry {
   }
 
   void Reset(const ros::Time& stamp) {
-    x_ = 0.0;
-    y_ = 0.0;
-    yaw_ = 0.0;
+    x_ = initial_x_;
+    y_ = initial_y_;
+    yaw_ = initial_yaw_;
     left_wheel_position_ = 0.0;
     right_wheel_position_ = 0.0;
     last_stamp_ = stamp;
@@ -289,6 +293,11 @@ class VirtualEncoderOdometry {
   double yaw_{0.0};
   double left_wheel_position_{0.0};
   double right_wheel_position_{0.0};
+
+  double initial_x_{0.0};
+  double initial_y_{0.0};
+  double initial_yaw_{0.0};
+
 };
 
 }  // namespace diff_tracked_base

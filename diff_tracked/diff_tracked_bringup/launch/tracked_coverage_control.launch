@@ -1,48 +1,59 @@
 <launch>
   <arg name="start_gazebo" default="true"/>
-  <!-- Keep the robot stationary until Gazebo, EKF and slam_toolbox are ready. -->
-  <arg name="start_control" default="true"/>
   <arg name="start_localization" default="true"/>
-  <!-- start_slam: online mapping; start_slam_localization: saved-map localization. -->
   <arg name="start_slam" default="false"/>
   <arg name="start_slam_localization" default="true"/>
+  <arg name="start_planning" default="true"/>
+  <arg name="start_control" default="true"/>
 
-  <!-- Base filename only; slam_toolbox appends .posegraph and .data. -->
+  <!-- These defaults match rectangle_field.yaml and its first path pose. -->
+  <arg name="world_name"
+       default="$(find gazebo_worlds)/worlds/rectangle_field.world"/>
+  <arg name="spawn_x" default="27.0"/>
+  <arg name="spawn_y" default="16.0"/>
+  <arg name="spawn_yaw" default="3.141592653589793"/>
+
   <arg name="posegraph_file"
-       default="/home/democles/diff_drive/posegraphs/encoder_only"/>
-  <!-- Initial robot pose in the saved map; yaw is in radians. -->
-  <arg name="localization_initial_x" default="0.0"/>
-  <arg name="localization_initial_y" default="0.0"/>
-  <arg name="localization_initial_yaw" default="0.0"/>
+       default="/home/democles/diff_drive/posegraphs/rectangle_field_posegraph"/>
+  <arg name="localization_initial_x" default="$(arg spawn_x)"/>
+  <arg name="localization_initial_y" default="$(arg spawn_y)"/>
+  <arg name="localization_initial_yaw" default="$(arg spawn_yaw)"/>
 
-  <arg name="distance" default="50.0"/>
-  <arg name="speed" default="2.0"/>
-  <arg name="initial_heading_deg" default="0.0"/>
+  <arg name="planning_config"
+       default="$(find diff_tracked_planning)/config/rectangle_field.yaml"/>
+  <arg name="path_topic" default="/coverage_path"/>
+  <arg name="speed" default="2"/>
   <arg name="control_startup_delay" default="5.0"/>
+  <arg name="odom_topic" default="/odom"/>
+
   <arg name="localization_pose_timeout" default="15.0"/>
   <arg name="origin_position_tolerance" default="0.30"/>
   <arg name="origin_yaw_tolerance" default="0.35"/>
   <arg name="localization_stable_duration" default="1.0"/>
-  <!-- The controller and slam_toolbox use the EKF result, not Gazebo ground truth. -->
-  <arg name="odom_topic" default="/odom"/>
 
-  <include if="$(arg start_gazebo)" file="$(find diff_tracked_gazebo)/launch/bunker_gazebo.launch" />
+  <include if="$(arg start_gazebo)"
+           file="$(find diff_tracked_gazebo)/launch/bunker_gazebo.launch">
+    <arg name="world_name" value="$(arg world_name)"/>
+    <arg name="spawn_x" value="$(arg spawn_x)"/>
+    <arg name="spawn_y" value="$(arg spawn_y)"/>
+    <arg name="spawn_yaw" value="$(arg spawn_yaw)"/>
+  </include>
 
   <include if="$(arg start_localization)"
            file="$(find diff_tracked_localization)/launch/ekf_odom.launch">
     <arg name="odom_input" value="/encoder_odom"/>
     <arg name="imu_input" value="/imu"/>
-    <arg name="odom_output" value="/odom"/>
+    <arg name="odom_output" value="$(arg odom_topic)"/>
     <arg name="base_frame" value="base_link"/>
-
-    <!-- EKF owns odom -> base_link. Gazebo's ground-truth TF is isolated. -->
     <arg name="publish_tf" value="true"/>
+    <arg name="initial_x" value="$(arg spawn_x)"/>
+    <arg name="initial_y" value="$(arg spawn_y)"/>
+    <arg name="initial_yaw" value="$(arg spawn_yaw)"/>
   </include>
 
-  <!-- slam_toolbox owns map -> odom. Localization takes priority if both
-       slam switches are true, preventing duplicate map -> odom publishers. -->
-  <include if="$(eval arg('start_slam') == 'true' and arg('start_slam_localization') != 'true')"
-           file="$(find slam_toolbox)/launch/online_async.launch" />
+  <!-- Only one node may publish map -> odom. -->
+  <include if="$(eval arg('start_slam') and not arg('start_slam_localization'))"
+           file="$(find slam_toolbox)/launch/online_async.launch"/>
 
   <include if="$(arg start_slam_localization)"
            file="$(find diff_tracked_bringup)/launch/slam_toolbox_localization.launch">
@@ -52,17 +63,22 @@
     <arg name="initial_pose_yaw" value="$(arg localization_initial_yaw)"/>
   </include>
 
-  <include if="$(arg start_control)" file="$(find diff_tracked_control)/launch/line_rpp_control.launch">
-    <arg name="distance" value="$(arg distance)"/>
-    <arg name="speed" value="$(arg speed)"/>
+  <include if="$(arg start_planning)"
+           file="$(find diff_tracked_planning)/launch/coverage_planner.launch">
+    <arg name="config" value="$(arg planning_config)"/>
+    <arg name="frame_id"
+         value="$(eval 'map' if arg('start_slam') or arg('start_slam_localization') else 'odom')"/>
+    <arg name="path_topic" value="$(arg path_topic)"/>
+  </include>
+
+  <include if="$(arg start_control)"
+           file="$(find diff_tracked_control)/launch/path_rpp_control.launch">
     <arg name="odom_topic" value="$(arg odom_topic)"/>
-    <!-- map uses slam_toolbox's correction; odom is used only without SLAM. -->
+    <arg name="path_topic" value="$(arg path_topic)"/>
     <arg name="map_frame"
          value="$(eval 'map' if arg('start_slam') or arg('start_slam_localization') else 'odom')"/>
-    <arg name="initial_heading_deg" value="$(arg initial_heading_deg)"/>
+    <arg name="speed" value="$(arg speed)"/>
     <arg name="startup_delay" value="$(arg control_startup_delay)"/>
-    <!-- In saved-map localization mode, keep /cmd_vel at zero until a fresh
-         /initialpose correction has converged and remained stable. -->
     <arg name="require_origin_confirmation"
          value="$(arg start_slam_localization)"/>
     <arg name="origin_pose_x" value="$(arg localization_initial_x)"/>
@@ -77,5 +93,4 @@
     <arg name="localization_stable_duration"
          value="$(arg localization_stable_duration)"/>
   </include>
-
 </launch>

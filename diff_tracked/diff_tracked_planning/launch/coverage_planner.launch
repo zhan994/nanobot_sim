@@ -1,0 +1,16 @@
+<launch>
+  <arg name="config"
+       default="$(find diff_tracked_planning)/config/rectangle_field.yaml"/>
+  <arg name="frame_id" default="map"/>
+  <arg name="path_topic" default="/coverage_path"/>
+
+  <node pkg="diff_tracked_planning"
+        type="f2c_coverage_planner_node"
+        name="f2c_coverage_planner"
+        output="screen">
+    <rosparam command="load" file="$(arg config)"/>
+    <!-- Override the YAML values when this launch is included by bringup. -->
+    <param name="frame_id" value="$(arg frame_id)"/>
+    <param name="path_topic" value="$(arg path_topic)"/>
+  </node>
+</launch>

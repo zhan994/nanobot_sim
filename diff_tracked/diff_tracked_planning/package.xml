@@ -1,21 +1,16 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>diff_tracked_control</name>
+  <name>diff_tracked_planning</name>
   <version>0.1.0</version>
-  <description>motion controllers</description>
+  <description>Fields2Cover coverage planning for the tracked robot.</description>
 
   <license>TODO</license>
   <maintainer email="nhy@163.com">democles</maintainer>
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <depend>geometry_msgs</depend>
   <depend>nav_msgs</depend>
   <depend>roscpp</depend>
-  <depend>sensor_msgs</depend>
-  <depend>std_srvs</depend>
-  <depend>tf2</depend>
-  <depend>tf2_ros</depend>
 
   <export/>
 </package>
