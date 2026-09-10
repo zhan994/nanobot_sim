@@ -8,7 +8,7 @@
 
   <!-- These defaults match rectangle_field.yaml and its first path pose. -->
   <arg name="world_name"
-       default="$(find diff_tracked_gazebo)/worlds/rectangle_field.world"/>
+       default="$(find gazebo_worlds)/worlds/rectangle_field.world"/>
   <arg name="spawn_x" default="27.0"/>
   <arg name="spawn_y" default="16.0"/>
   <arg name="spawn_yaw" default="3.141592653589793"/>

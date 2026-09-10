@@ -7,7 +7,7 @@
 
   <include file="$(find diff_tracked_gazebo)/launch/bunker_gazebo.launch">
     <arg name="world_name"
-         value="$(find diff_tracked_gazebo)/worlds/rectangle_field.world"/>
+         value="$(find gazebo_worlds)/worlds/rectangle_field.world"/>
     <arg name="spawn_x" value="$(arg spawn_x)"/>
     <arg name="spawn_y" value="$(arg spawn_y)"/>
     <arg name="spawn_yaw" value="$(arg spawn_yaw)"/>
